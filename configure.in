@@ -1,0 +1,274 @@
+AC_INIT(hxd.h)
+AC_PREREQ(2.12)
+
+AC_CONFIG_HEADER(config.h)
+
+AC_PREFIX_DEFAULT(/usr/local)
+
+AC_SUBST(OBJS)
+AC_SUBST(LIBOBJS)
+AC_SUBST(WARN)
+AC_SUBST(INCLUDES)
+AC_SUBST(GINCLUDES)
+AC_SUBST(TARGETS)
+AC_SUBST(HXHXDOBJS)
+AC_SUBST(HXDOBJS)
+AC_SUBST(HXOBJS)
+AC_SUBST(GHXOBJS)
+AC_SUBST(HXDLIBOBJS)
+AC_SUBST(HXLIBOBJS)
+AC_SUBST(HXDLIBS)
+AC_SUBST(HXLIBS)
+AC_SUBST(GHXLIBS)
+AC_SUBST(CURSESLIBS)
+AC_SUBST(CIPHERLIBS)
+AC_SUBST(COMPRESSLIBS)
+AC_SUBST(INCLUDE_DEPEND)
+
+AC_ARG_ENABLE(htxf-pthread,	[  --enable-htxf-pthread      use pthread instead of fork or clone for htxf], , enable_htxf_pthread=no)
+AC_ARG_ENABLE(htxf-clone,	[  --enable-htxf-clone        use clone instead of fork for htxf], , enable_htxf_clone=no)
+AC_ARG_ENABLE(htxf-fork,	[  --enable-htxf-fork         use fork instead of clone for htxf], , enable_htxf_fork=no)
+AC_ARG_ENABLE(hfs,		[  --enable-hfs               enable CAP/NetATalk/AppleDouble support], , enable_hfs=yes)
+AC_ARG_ENABLE(hope,		[  --enable-hope              enable HOPE], , enable_hope=no)
+AC_ARG_ENABLE(cipher,		[  --enable-cipher            enable cipher], , enable_cipher=no)
+AC_ARG_ENABLE(compress,		[  --enable-compress          enable compress], , enable_compress=no)
+AC_ARG_ENABLE(hal,		[  --enable-hal               compile MegaHAL], , enable_hal=no)
+AC_ARG_ENABLE(xmms,		[  --enable-xmms              enable trackname command], , enable_xmms=no)
+AC_ARG_ENABLE(sql,		[  --enable-sql               use mysql logging], , enable_sql=no)
+AC_ARG_ENABLE(gtk,		[  --enable-gtk               compile gtk frontend], , enable_gtk=no)
+AC_ARG_ENABLE(dulled,		[  --enable-dulled            enabled dulled idle user icons], , enable_dulled=no)
+AC_ARG_ENABLE(tty,		[  --enable-tty               compile tty frontend], , enable_tty=yes)
+AC_ARG_ENABLE(ipv6,		[  --enable-ipv6              IPv6 support. IPv4 will not work], , enable_ipv6=no)
+AC_ARG_ENABLE(all,		[  --enable-all               do not enable this], , enable_all=no)
+AC_ARG_WITH(depend,		[  --with-depend[=string]     add include .depend to Makefile], , with_depend=no)
+AC_ARG_WITH(socks,		[  --with-socks[=dir]         use socks library in dir], , with_socks=no)
+AC_ARG_WITH(socks_include,	[  --with-socks-include=dir   use socks header in dir], , with_socks_include=no)
+AC_ARG_WITH(sndplayer,		[  --with-sndplayer=player    default=play], , with_sndplayer=play)
+
+if test $enable_all = yes; then
+	enable_htxf_clone=yes;
+	enable_hfs=yes;
+	enable_hope=yes;
+	enable_cipher=yes;
+	enable_compress=yes;
+	enable_hal=yes;
+	enable_gtk=yes;
+	enable_dulled=yes;
+	enable_tty=yes;
+	enable_xmms=yes;
+	with_depend=yes;
+fi
+
+if test $enable_ipv6 = yes; then
+	AC_DEFINE(CONFIG_IPV6)
+fi
+if test $enable_htxf_pthread = yes; then
+	AC_DEFINE(CONFIG_HTXF_PTHREAD)
+	HXLIBS="$HXLIBS -lpthread"
+	HXDLIBS="$HXDLIBS -lpthread"
+else
+	if test $enable_htxf_clone = yes; then
+		AC_DEFINE(CONFIG_HTXF_CLONE)
+	else
+		enable_htxf_fork=yes;
+	fi
+fi
+if test $enable_htxf_fork = yes; then
+	AC_DEFINE(CONFIG_HTXF_FORK)
+fi
+if test $enable_hfs = yes; then
+	HXHXDOBJS="$HXHXDOBJS hfs.o"
+	AC_DEFINE(CONFIG_HFS)
+fi
+if test $enable_hope = yes; then
+	AC_DEFINE(CONFIG_HOPE)
+	HXHXDOBJS="$HXHXDOBJS hmac.o"
+fi
+if test $enable_sql = yes; then
+	AC_DEFINE(CONFIG_SQL)
+	INCLUDES="$INCLUDES -I/usr/include/mysql"
+	HXDLIBS="$HXDLIBS -lmysqlclient"
+fi
+if test ! $with_depend = no; then
+	if test $with_depend != yes; then
+		INCLUDE_DEPEND="$with_depend"
+	fi
+	if test -z "$INCLUDE_DEPEND"; then
+		INCLUDE_DEPEND="include .depend"
+	fi
+fi
+
+AC_PROG_CC
+AC_CANONICAL_HOST
+
+if test $cross_compiling = yes; then
+	AC_CHECK_PROGS(BUILD_CC, gcc cc)
+	CC=$BUILD_CC
+fi
+
+if test $ac_cv_prog_gcc = yes; then
+	WARN='-Wall -W'
+fi
+
+AC_ISC_POSIX
+AC_C_CONST
+AC_C_INLINE
+AC_C_BIGENDIAN
+
+AC_MSG_CHECKING(for Mac OS X)
+AC_TRY_COMPILE([#include <Carbon/Carbon.h>],[FSRef foo;],[
+	AC_DEFINE(CARBON)
+	AC_MSG_RESULT(yes)
+	HXDLIBS="$HXDLIBS -framework Carbon"],AC_MSG_RESULT(no))
+
+AC_PATH_PROG(TR, tr, "/bin/tr")
+AC_DEFINE_UNQUOTED(PATH_TR, "$TR")
+
+darwin=0;
+case "$host" in
+	*-darwin*)
+		AC_DEFINE(DARWIN)
+		darwin=1;
+		;;
+esac
+
+AC_TYPE_SIGNAL
+AC_TYPE_SIZE_T
+AC_CHECK_TYPE(ssize_t, long)
+AC_CHECK_TYPE(u_int8_t, unsigned char)
+AC_CHECK_TYPE(u_int16_t, unsigned short)
+AC_CHECK_TYPE(u_int32_t, unsigned int)
+AC_CHECK_TYPE(int8_t, char)
+AC_CHECK_TYPE(int16_t, short)
+AC_CHECK_TYPE(int32_t, int)
+
+AC_CHECK_HEADERS(sys/select.h stdarg.h)
+
+if test ! $with_socks = no; then
+	if test ! $with_socks = yes; then
+		LIBS="$LIBS -L$with_socks"
+	fi
+	CFLAGS="$CFLAGS -DSOCKS -DINCLUDE_PROTOTYPES"
+	if test ! $with_socks_include = no; then
+		INCLUDES="$INCLUDES -I$with_socks_include"
+	fi
+	AC_CHECK_LIB(socks5, SOCKSinit)
+fi
+
+if test $enable_cipher = yes; then
+	AC_DEFINE(CONFIG_CIPHER)
+	HXHXDOBJS="$HXHXDOBJS cipher.o"
+else
+	CIPHERLIBS=""
+fi
+
+if test $enable_compress = yes; then
+	AC_DEFINE(CONFIG_COMPRESS)
+	HXHXDOBJS="$HXHXDOBJS compress.o"
+	AC_CHECK_LIB(z, deflate, COMPRESSLIBS="$COMPRESSLIBS -lz")
+else
+	COMPRESSLIBS=""
+fi
+
+AC_CHECK_FUNCS(snprintf,
+	AC_CHECK_FUNCS(vsnprintf, , LIBOBJS="$LIBOBJS snprintf.o"; ac_cv_func_snprintf=no),
+	LIBOBJS="$LIBOBJS snprintf.o"; ac_cv_func_snprintf=no)
+if test $ac_cv_func_snprintf = yes; then
+	AC_MSG_CHECKING(for broken snprintf)
+	AC_CACHE_VAL(ac_cv_broken_snprintf,AC_TRY_RUN([
+#include <stdio.h>
+int main()
+{
+	char buf;
+	if (snprintf(&buf, 1, "ab%s", "cdefg")!=-1)
+		return 1;
+	return 0;
+}
+], ac_cv_broken_snprintf=no, ac_cv_broken_snprintf=yes))
+	AC_MSG_RESULT($ac_cv_broken_snprintf)
+	if test $ac_cv_broken_snprintf = yes; then
+		AC_DEFINE(BROKEN_SNPRINTF)
+		LIBOBJS="$LIBOBJS snprintf.o"
+	fi
+fi
+
+AC_REPLACE_FUNCS(localtime_r inet_aton)
+AC_CHECK_FUNCS(getrlimit getdtablesize)
+AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, gethostbyname))
+AC_CHECK_FUNC(socket, , AC_CHECK_LIB(socket, socket))
+AC_CHECK_LIB(ncurses, initscr, CURSESLIBS="$CURSESLIBS -lncurses", AC_CHECK_LIB(curses, initscr, CURSESLIBS="$CURSESLIBS -lcurses"))
+
+AC_CHECK_HEADERS(termcap.h)
+AC_CHECK_FUNC(strcasestr, AC_DEFINE(HAVE_STRCASESTR), HXLIBOBJS="$HXLIBOBJS strcasestr.o")
+AC_CHECK_FUNC(basename, AC_DEFINE(HAVE_BASENAME), HXLIBOBJS="$HXLIBOBJS basename.o")
+AC_CHECK_FUNCS(hstrerror gethostname putenv tcgetattr tcsetattr)
+AC_CHECK_FUNC(getopt_long_r, , HXLIBOBJS="$HXLIBOBJS getopt_r.o getopt1_r.o")
+HXOBJS="$HXOBJS hx_hlwrite.o"
+if test $enable_hal = yes; then
+	HXOBJS="$HXOBJS hal.o"
+	AC_DEFINE(CONFIG_HAL)
+	AC_CHECK_LIB(moto, log, HXLIBS="$HXLIBS -lmoto", AC_CHECK_LIB(m, log, HXLIBS="$HXLIBS -lm"))
+fi
+if test $enable_xmms = yes; then
+	AC_DEFINE(CONFIG_XMMS)
+	HXOBJS="$HXOBJS xmmslib.o"
+fi
+if test -n $with_sndplayer; then
+	AC_DEFINE_UNQUOTED(DEFAULT_SND_PLAYER, "$with_sndplayer")
+fi
+if test $enable_gtk = yes; then
+	GINCLUDES="$GINCLUDES `gtk-config --cflags gtk`"
+	GINCLUDES="$GINCLUDES `glib-config --cflags glib`"
+	GHXLIBS="$GHXLIBS `gtk-config --libs gtk`"
+	GHXLIBS="$GHXLIBS `glib-config --libs glib`"
+	GHXOBJS="$GHXOBJS gtk_hlist.o hx_gtk.o hx_gtk_about.o cicn.o history.o"
+	TARGETS="$TARGETS ghx"
+fi
+if test $enable_dulled = yes; then
+	AC_DEFINE(CONFIG_DULLED)
+fi
+if test $enable_tty = yes; then
+	TARGETS="$TARGETS hx"
+	if test $darwin = 0; then
+		TERMCAPTEST=YES
+	fi
+	AC_CHECK_LIB(termcap, tgetent, TERMCAPLIB="-ltermcap",TERMCAPTEST=NO)
+
+##################### BEGINNING - the weird test for the wrong libtermcap rpm packages
+	if test $darwin = 0; then
+		if test $TERMCAPTEST = NO; then
+			echo "libtermcap doesn't seem to be properly installed"
+			echo "doing some more checking"
+			termcap_here=`/sbin/ldconfig -p|grep libtermcap|awk '{print $4}'|head -1`			
+			if test $termcap_here = "" ;then
+				echo "you really have no libtermcap installed." 
+				exit
+			else
+				echo "we finally found a libtermcap here"
+				echo $termcap_here
+				TERMCAPLIB=$termcap_here
+			fi
+		fi
+	else
+		echo "no need to test for libtermcap.so"
+		echo "darwin... using tgetent -lreadline"
+	fi
+##################### END - the weird test for the wrong libtermcap rpm packages
+
+	SAVE_LIBS="$LIBS"
+	LIBS="$LIBS $TERMCAPLIB"
+	AC_CHECK_LIB(readline, rl_callback_handler_install, HXLIBS="$HXLIBS -lreadline")
+	AC_CHECK_LIB(history, using_history, HXLIBS="$HXLIBS -lhistory")
+	LIBS="$SAVE_LIBS"
+	if test -n "$TERMCAPLIB"; then
+		HXLIBS="$HXLIBS $TERMCAPLIB"
+	fi
+fi
+
+AC_REPLACE_FUNCS(inet_ntoa_r)
+if test $enable_hope = yes; then
+	HXHXDOBJS="$HXHXDOBJS rand.o md5.o sha.o haval.o"
+	AC_CHECK_LIB(crypto, RAND_bytes, CIPHERLIBS="$CIPHERLIBS -lcrypto")
+fi
+
+AC_OUTPUT(Makefile)

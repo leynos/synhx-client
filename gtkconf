@@ -1,0 +1,2 @@
+#!/bin/sh
+./configure --enable-hotline-client --enable-htxf-clone --enable-gtk --disable-tty --with-depend $* 

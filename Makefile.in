@@ -1,0 +1,91 @@
+srcdir=@srcdir@
+prefix=@prefix@
+sbindir=$(prefix)/sbin
+mandir=$(prefix)/man
+VPATH=@srcdir@
+
+CC = @CC@
+LD = @CC@
+CFLAGS = @CFLAGS@
+DEFS = @DEFS@ -D_REENTRANT -D_GNU_SOURCE
+GINCLUDES = @GINCLUDES@
+INCLUDES = @INCLUDES@ $(GINCLUDES) -I$(srcdir)
+WARN = @WARN@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+GHXLIBS = @GHXLIBS@
+TTYHXLIBS = @TTYHXLIBS@
+HXLIBS = @HXLIBS@
+HXDLIBS = @HXDLIBS@
+CURSESLIBS = @CURSESLIBS@
+CIPHERLIBS = @CIPHERLIBS@
+COMPRESSLIBS = @COMPRESSLIBS@
+
+LIBOBJS = @LIBOBJS@
+HXLIBOBJS = @HXLIBOBJS@
+HXHXDOBJS = decode.o @HXHXDOBJS@
+OBJS = fd.o version.o xmalloc.o @OBJS@ $(LIBOBJS)
+GHXOBJS = @GHXOBJS@ ghx_hxd.o ghx_tty.o ghx_hlclient.o
+TTYHXOBJS = hx_tty.o hx_hxd.o hlclient.o
+HXOBJS = hx_chat.o hx_users.o hx_commands.o macres.o @HXOBJS@ $(HXHXDOBJS) $(HXLIBOBJS)
+TARGETS = @TARGETS@
+
+.c.o:
+#	$(CC) $(CFLAGS) $(CFLAGS_$(@)) $(WARN) $(DEFS) $(INCLUDES) -c $(<)
+	$(CC) $(CFLAGS) $(WARN) $(DEFS) $(INCLUDES) -c $(<)
+
+all: $(TARGETS)
+
+hx_hxd.o: hxd.c hxd.h
+	$(CC) $(CFLAGS) $(CFLAGS_hxd.o) $(WARN) $(DEFS) $(INCLUDES) -DONLY_CLIENT -c hxd.c -o $(@)
+ghx_hxd.o: hxd.c hxd.h
+	$(CC) $(CFLAGS) $(CFLAGS_hxd.o) $(WARN) $(DEFS) $(INCLUDES) -DONLY_CLIENT -DONLY_GTK -c hxd.c -o $(@)
+ghx_tty.o: hx_tty.c hx.h hxd.h
+	$(CC) $(CFLAGS) $(CFLAGS_hx_tty.o) $(WARN) $(DEFS) $(INCLUDES) -DONLY_GTK -c hx_tty.c -o $(@)
+ghx_hlclient.o: hlclient.c hx.h hxd.h
+	$(CC) $(CFLAGS) $(CFLAGS_hlclient.o) $(WARN) $(DEFS) $(INCLUDES) -DONLY_GTK -c hlclient.c -o $(@)
+
+hx_hlwrite.o: hlwrite.c hxd.h
+	$(CC) $(CFLAGS) $(CFLAGS_hlwrite.o) $(WARN) $(DEFS) $(INCLUDES) -DONLY_CLIENT -c hlwrite.c -o $(@)
+
+hx: $(OBJS) $(HXOBJS) $(TTYHXOBJS)
+	$(LD) $(LDFLAGS) -o $(@) $(OBJS) $(HXOBJS) $(TTYHXOBJS) $(LIBS) $(HXLIBS) $(CIPHERLIBS) $(COMPRESSLIBS)
+
+ghx: $(OBJS) $(HXOBJS) $(GHXOBJS)
+	$(LD) $(LDFLAGS) -o $(@) $(OBJS) $(HXOBJS) $(GHXOBJS) $(LIBS) $(HXLIBS) $(GHXLIBS) $(CIPHERLIBS) $(COMPRESSLIBS)
+
+clean:
+	rm -f $(OBJS) $(HXDOBJS) $(HXOBJS) $(GHXOBJS) $(TTYHXOBJS) $(HXHXDOBJS) $(HXTRACKDOBJS) $(TARGETS) acctedit .depend
+
+distclean: clean
+	rm -f config.cache config.log config.status Makefile config.h
+
+install: $(TARGETS)
+
+uninstall:
+
+# depend stuff
+MFLAG = -M
+
+LIBSRCS = basename.c getopt1_r.c getopt_r.c inet_aton.c inet_ntoa_r.c \
+	localtime_r.c realpath.c snprintf.c strcasestr.c strptime.c
+GSRCS = cicn.c hx_gtk.c hx_gtk_about.c macres.c
+XMMSSRCS = xmmslib.c
+SQLSRCS = sql.c
+HOPESRCS = hmac.c rand.c
+CIPHERSRCS = cipher.c
+COMPRESSSRCS = compress.c
+SRCS = chat.c decode.c fd.c files.c hal.c haval.c \
+	hlclient.c hlwrite.c hx_chat.c hx_users.c hx_commands.c \
+	hx_tty.c hxd.c ident.c md5.c news.c rcv.c sha.c \
+	version.c xmalloc.c $(GSRCS) $(XMMSSRCS) $(SQLSRCS) \
+	$(HOPESRCS) $(CIPHERSRCS) $(COMPRESSSRCS) $(LIBSRCS)
+
+.depend: #$(SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(MFLAG) $(DEFS) $(SRCS) >$(@)
+
+depend: .depend
+dep: .depend
+
+# include .depend
+@INCLUDE_DEPEND@
