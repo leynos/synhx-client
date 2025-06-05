@@ -47,20 +47,20 @@ hx_user_with_uid (struct hx_user *ulist, u_int32_t uid)
 struct hx_user *
 hx_user_with_name (struct hx_user *ulist, u_int8_t *name)
 {
-	int ulen, uplen, nlen;
-	struct hx_user *userp, *user = 0;
+        int ulen, uplen, nlen;
+        struct hx_user *userp, *user = 0;
 
-	nlen = strlen(name);
-	for (userp = ulist->next; userp; userp = userp->next) {
-		if (!strncmp(userp->name, name, nlen)) {
-			if (user) {
-				ulen = strlen(user->name);
-				uplen = strlen(userp->name);
-				if (!((uplen == nlen && ulen != nlen) || (ulen == nlen && uplen != nlen)))
-					return 0;
-			}
-			user = userp;
-		}
+        nlen = strlen((const char *)name);
+        for (userp = ulist->next; userp; userp = userp->next) {
+                if (!strncmp((const char *)userp->name, (const char *)name, nlen)) {
+                        if (user) {
+                                ulen = strlen((const char *)user->name);
+                                uplen = strlen((const char *)userp->name);
+                                if (!((uplen == nlen && ulen != nlen) || (ulen == nlen && uplen != nlen)))
+                                        return 0;
+                        }
+                        user = userp;
+                }
 	}
 
 	return user;

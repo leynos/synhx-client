@@ -718,9 +718,10 @@ hotline_client_read_tty (int fd)
 }
 
 static void
-term_rl_input (void)
+term_rl_input (char *line)
 {
-	add_history(rl_line_buffer);
+        (void)line;
+        add_history(rl_line_buffer);
 	using_history();
 	hotline_client_input(&hx_htlc, tty_chat_front, rl_line_buffer);
 	rl_point = 0;
@@ -747,9 +748,11 @@ last_msg (void)
 }
 
 static int
-tab (void)
+tab (int count, int key)
 {
-	char *buf = xmalloc(rl_end + 4096);
+        (void)count;
+        (void)key;
+        char *buf = xmalloc(rl_end + 4096);
 	int point;
 
 	strcpy(buf, rl_line_buffer);

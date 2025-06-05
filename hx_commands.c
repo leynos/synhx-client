@@ -3609,13 +3609,12 @@ xfer_pipe_ready_read (int fd)
 			hx_output.file_update(htxf);
 		} else if (fu.type == 1) {
 			/* done */
-			struct timeval now;
-			time_t sdiff, usdiff, Bps;
+                        struct timeval now;
+                        time_t sdiff, Bps;
 			char humanbuf[LONGEST_HUMAN_READABLE+1], *bpsstr;
 
 			gettimeofday(&now, 0);
-			sdiff = now.tv_sec - htxf->start.tv_sec;
-			usdiff = now.tv_usec - htxf->start.tv_usec;
+                        sdiff = now.tv_sec - htxf->start.tv_sec;
 			if (!sdiff)
 				sdiff = 1;
 			Bps = htxf->total_pos / sdiff;
@@ -4105,8 +4104,8 @@ COMMAND(xfers)
 	hx_output.mode_clear();
 	LOCK_HTXF(&hx_htlc);
 	for (i = 0; i < nxfers; i++) {
-		struct timeval now;
-		time_t sdiff, usdiff, Bps, eta;
+                struct timeval now;
+                time_t sdiff, Bps, eta;
 
 		if (argc > 1) {
 			for (j = 1; j < argc; j++)
@@ -4117,8 +4116,7 @@ COMMAND(xfers)
 want_this:
 		htxfp = xfers[i];
 		gettimeofday(&now, 0);
-		sdiff = now.tv_sec - htxfp->start.tv_sec;
-		usdiff = now.tv_usec - htxfp->start.tv_usec;
+                sdiff = now.tv_sec - htxfp->start.tv_sec;
 		if (!sdiff)
 			sdiff = 1;
 		Bps = htxfp->total_pos / sdiff;
