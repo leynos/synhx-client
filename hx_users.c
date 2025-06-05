@@ -47,7 +47,7 @@ hx_user_with_uid (struct hx_user *ulist, u_int32_t uid)
 struct hx_user *
 hx_user_with_name (struct hx_user *ulist, u_int8_t *name)
 {
-        int ulen, uplen, nlen;
+        size_t ulen, uplen, nlen;
         struct hx_user *userp, *user = 0;
 
         nlen = strlen((const char *)name);
