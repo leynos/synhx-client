@@ -1079,8 +1079,8 @@ output_file_list (struct htlc_conn *htlc, struct cached_filelist *cfl)
 	u_int32_t fnlen;
 	struct hl_filelist_hdr *fh;
 
-	for (fh = cfl->fh; (u_int32_t)((char *)fh - (char *)cfl->fh) < cfl->fhlen;
-	     (char *)fh += ntohs(fh->len) + SIZEOF_HL_DATA_HDR) {
+       for (fh = cfl->fh; (u_int32_t)((char *)fh - (char *)cfl->fh) < cfl->fhlen;
+            fh = (struct hl_filelist_hdr *)((char *)fh + ntohs(fh->len) + SIZEOF_HL_DATA_HDR)) {
 		fnlen = ntohl(fh->fnlen);
 		for (i = 0, bpos = 0; i < fnlen && bpos < sizeof(buf); i++) {
 			if (!isgraph(fh->fname[i])) {
