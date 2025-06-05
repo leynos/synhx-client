@@ -493,7 +493,7 @@ macres_res_ref_list_read (int fd, macres_res_ref_list *rl)
 {
 	rl->resid = be_read16(fd);
 	rl->res_map_name_list_name_off = be_read16(fd);
-	read(fd, &rl->res_attrs, 1);
+        (void)read(fd, &rl->res_attrs, 1);
 	rl->res_data_off = be_read24(fd);
 	/* Skip the reserved handle field */
 	lseek(fd, 4, SEEK_CUR);

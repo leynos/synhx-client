@@ -432,10 +432,10 @@ void tfark ()
 #endif
 
 static RETSIGTYPE
-sig_fpe (int sig, int fpe)
+sig_fpe (int sig)
 {
-	hxd_log("SIGFPE (%d): %d", sig, fpe);
-	abort();
+        hxd_log("SIGFPE (%d)", sig);
+        abort();
 }
 
 #if XMALLOC_DEBUG
@@ -482,7 +482,7 @@ main (int argc __attribute__((__unused__)), char **argv __attribute__((__unused_
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGHUP, &act, 0);
 	sigaction(SIGPIPE, &act, 0);
-	act.sa_handler = (RETSIGTYPE (*)(int))sig_fpe;
+        act.sa_handler = sig_fpe;
 	sigaction(SIGFPE, &act, 0);
 	act.sa_handler = sig_bus;
 	sigaction(SIGBUS, &act, 0);
