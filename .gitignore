@@ -1,0 +1,26 @@
+# Ignore build artifacts
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+
+# Binaries
+hx
+hx_gtk
+hxd
+
+# Build directories
+build/
+build-*/
+
+# Autotools generated files
+Makefile
+config.h
+config.log
+config.status
