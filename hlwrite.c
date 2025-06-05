@@ -16,10 +16,10 @@ hlwrite (struct htlc_conn *htlc, u_int32_t type, u_int32_t flag, int hc, ...)
 	struct qbuf *q;
 	u_int32_t this_off, pos, len;
 
-	if (!htlc->fd)
-		return;
+    if (!htlc->fd)
+            return;
 
-		q = &htlc->out;
+    q = &htlc->out;
 	this_off = q->pos + q->len;
 	pos = this_off + SIZEOF_HL_HDR;
 	q->len += SIZEOF_HL_HDR;

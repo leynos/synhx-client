@@ -7,7 +7,7 @@ be_read32 (int fd)
 	u_int32_t word;
  	u_int8_t buf[4];
 
-	read(fd, buf, 4);
+        (void)read(fd, buf, 4);
 	word = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 
 	return word;
@@ -19,7 +19,7 @@ be_read24 (int fd)
 	u_int32_t word;
  	u_int8_t buf[3];
  
-	read(fd, buf, 3);
+        (void)read(fd, buf, 3);
 	word = (buf[0] << 16) | (buf[1] << 8) | buf[2];
 
 	if (buf[0] > 0x7f)
@@ -34,7 +34,7 @@ be_read16 (int fd)
 	u_int16_t word;
 	u_int8_t buf[2];
 
-	read(fd, buf, 2);
+        (void)read(fd, buf, 2);
 	word = (buf[0] << 8) | buf[1];
 
 	return word;

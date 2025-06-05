@@ -70,7 +70,7 @@ colorstr (u_int16_t color)
 static void
 term_flush (void)
 {
-	write(1, term_flush_buf, term_flush_len);
+    (void)write(1, term_flush_buf, term_flush_len);
 	term_flush_len = 0;
 }
 
@@ -164,13 +164,11 @@ term_status (void)
 #else
 	char addr[16];
 #endif
-	char *col;
+    if (dumb)
+        return;
 
-	if (dumb)
-		return;
-	col = colorstr(hx_htlc.color);
-	tputs(tgoto(CM, 0, line_status), 0, term_putc);
-	term_flush();
+    tputs(tgoto(CM, 0, line_status), 0, term_putc);
+    term_flush();
 #ifdef CONFIG_IPV6
 	inet_ntop(AFINET, (char *)&hx_htlc.sockaddr.SIN_ADDR, addr, sizeof(addr));
 #else
@@ -187,7 +185,7 @@ term_status (void)
 		      hx_htlc.uid, addr, ntohs(hx_htlc.sockaddr.SIN_PORT));
 	len += sprintf(buf+len, "%*s%s", CO-len+6, " ", DEFAULT);
 #endif
-	write(1, buf, len);
+    (void)write(1, buf, len);
 	tputs(CE, 0, term_putc);
 	tputs(tgoto(CM, rl_point % CO, line_input), 0, term_putc);
 	term_flush();
@@ -225,7 +223,7 @@ term_sigtstp (int sig __attribute__((__unused__)))
 {
 	tcgetattr(tty_fd, &new_tty);
 	term_reset();
-	write(1, "\r", 1);
+    (void)write(1, "\r", 1);
 	raise(SIGSTOP);
 }
 
@@ -295,14 +293,14 @@ term_init ()
 	i = tgetent(termcap, term_name);
 	if (i <= 0) {
 		if (i == -1) {
-			write(1, "tgetent had trouble accessing the termcap database\n", 51);
+                    (void)write(1, "tgetent had trouble accessing the termcap database\n", 51);
 		} else {
-			write(1, "tgetent did not find an entry for '", 25);
-			write(1, term_name, strlen(term_name));
-			write(1, "'\n", 2);
+                    (void)write(1, "tgetent did not find an entry for '", 25);
+                    (void)write(1, term_name, strlen(term_name));
+                    (void)write(1, "'\n", 2);
 		}
 want_dumb:
-		write(1, "running in dumb terminal mode\n", 31);
+            (void)write(1, "running in dumb terminal mode\n", 31);
 		goto ret;
 	}
 	if (!(ep = getenv("COLUMNS")) || !(CO = strtol(ep, 0, 0)))
@@ -380,7 +378,7 @@ term_puts (char *buf, size_t len)
 			len--;
 		} else last_co += len;
 	}
-	write(1, buf, len);
+    (void)write(1, buf, len);
 	if (!dumb) {
 		tputs(tgoto(CM, rl_point % CO, line_input), 0, term_putc);
 		term_flush();
@@ -429,7 +427,7 @@ draw (char *ln0, size_t len)
 	term_status();
 	tputs(tgoto(CM, 0, 0), 0, term_putc);
 	term_flush();
-	write(1, ln0, len);
+    (void)write(1, ln0, len);
 	tputs(tgoto(CM, 0, line_input), 0, term_putc);
 	term_flush();
 	rl_on_new_line();
@@ -458,7 +456,7 @@ cl:
 	tputs(tgoto(CM, 0, 0), 0, term_putc);
 	term_flush();
 	if (ln0)
-		write(1, ln0, (ln1 - 1) - ln0);
+            (void)write(1, ln0, (ln1 - 1) - ln0);
 	tputs(tgoto(CM, 0, line_input), 0, term_putc);
 	term_flush();
 	rl_on_new_line();
@@ -485,7 +483,7 @@ line_up ()
 	tputs(tgoto(CM, 0, 0), 0, term_putc);
 	tputs(SR, 0, term_putc);
 	term_flush();
-	write(1, ln0, (ln1 - 1) - ln0);
+    (void)write(1, ln0, (ln1 - 1) - ln0);
 	tputs(tgoto(CM, rl_point % CO, line_input), 0, term_putc);
 	term_flush();
 }
@@ -514,7 +512,7 @@ line_down ()
 	tputs(tgoto(CM, 0, line_output), 0, term_putc);
 	tputs(SF, 0, term_putc);
 	term_flush();
-	write(1, ln0, (ln1 - 1) - ln0);
+    (void)write(1, ln0, (ln1 - 1) - ln0);
 	tputs(tgoto(CM, rl_point % CO, line_input), 0, term_putc);
 	term_flush();
 }
