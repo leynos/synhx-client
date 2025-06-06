@@ -77,7 +77,7 @@ struct hfs_dbl_hdr {
 
 /* finder metadata for CAP */
 struct hfs_cap_info {
-	u_int8_t	fi_fndr[32];	/* Finder's info */
+	char            fi_fndr[32];	/* Finder's info */
 	u_int16_t	fi_attr;	/* AFP attributes (f=file/d=dir) */
 #define HFS_AFP_INV		0x001   /* Invisible bit (f/d) */
 #define HFS_AFP_EXPFOLDER	0x002   /* exported folder (d) */
@@ -121,20 +121,20 @@ struct hfs_cap_info {
 #define SIZEOF_HFS_CAP_INFO	300
 
 struct hfsinfo {
-	u_int8_t type[4];
-	u_int8_t creator[4];
+        char type[4];
+        char creator[4];
 	u_int32_t create_time;
 	u_int32_t modify_time;
 	u_int32_t rsrclen;
 	u_int32_t comlen;
-	u_int8_t comment[200];
+        char comment[200];
 };
 
 extern int finderinfo_path (char *infopath, const char *path, struct stat *statbuf);
 extern int resource_path (char *rsrcpath, const char *path, struct stat *statbuf);
 extern int resource_open (const char *path, int mode, int perm);
 extern size_t resource_len (const char *path);
-extern void type_creator (u_int8_t *buf, const char *path);
+extern void type_creator (char *buf, const char *path);
 extern void hfsinfo_read (const char *path, struct hfsinfo *fi);
 extern void hfsinfo_write (const char *path, struct hfsinfo *fi);
 extern size_t comment_len (const char *path);

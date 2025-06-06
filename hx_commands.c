@@ -369,7 +369,7 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 {
 	u_int32_t uid = 0, cid = 0, icon = 0, color = 0;
 	u_int16_t nlen = 0, got_color = 0;
-	u_int8_t name[32];
+        char name[32];
 	struct hx_chat *chat;
 	struct hx_user *user;
 	struct hl_hdr *h = (struct hl_hdr *)htlc->in.buf;
@@ -410,19 +410,19 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 		user = hx_user_new(&chat->user_tail);
 		chat->nusers++;
 		user->uid = uid;
-                hx_output.user_create(htlc, chat, user, (char *)name, icon, color);
+                hx_output.user_create(htlc, chat, user, name, icon, color);
 		if (hx_output.user_create != hx_tty_output.user_create
 		    && tty_show_user_joins)
-                        hx_tty_output.user_create(htlc, chat, user, (char *)name, icon, color);
+                        hx_tty_output.user_create(htlc, chat, user, name, icon, color);
 		play_sound(snd_join);
 	} else {
 		if (!got_color)
 			color = user->color;
 		if (hx_output.user_change != hx_tty_output.user_change || !user->ignore)
-                        hx_output.user_change(htlc, chat, user, (char *)name, icon, color);
+                        hx_output.user_change(htlc, chat, user, name, icon, color);
 		if (hx_output.user_change != hx_tty_output.user_change
 		    && tty_show_user_changes && !user->ignore)
-                        hx_tty_output.user_change(htlc, chat, user, (char *)name, icon, color);
+                        hx_tty_output.user_change(htlc, chat, user, name, icon, color);
 	}
 	if (nlen) {
 		memcpy(user->name, name, nlen);
@@ -436,7 +436,7 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 		htlc->uid = user->uid;
 		htlc->icon = user->icon;
 		htlc->color = user->color;
-                strcpy((char *)htlc->name, (char *)user->name);
+                strcpy(htlc->name, user->name);
 		hx_output.status();
 	}
 }
@@ -502,7 +502,7 @@ hx_rcv_chat_subject (struct htlc_conn *htlc)
 	if (subject) {
 		memcpy(chat->subject, subject, slen);
 		chat->subject[slen] = 0;
-                hx_output.chat_subject(htlc, cid, (char *)chat->subject);
+                hx_output.chat_subject(htlc, cid, chat->subject);
 	}
 	if (password) {
 		memcpy(chat->password, password, plen);
@@ -516,7 +516,7 @@ hx_rcv_chat_invite (struct htlc_conn *htlc)
 {
 	u_int32_t uid = 0, cid = 0;
 	u_int16_t nlen;
-	u_int8_t name[32];
+        char name[32];
 	struct hx_user *user = 0;
 	struct hx_chat *chat = hx_chat_with_cid(htlc, 0);
 
@@ -1029,7 +1029,7 @@ COMMAND(ignore)
 	}
         uid = atou32(name);
         if (!uid) {
-                user = hx_user_with_name(hchat->user_list, (u_int8_t *)name);
+                user = hx_user_with_name(hchat->user_list, name);
 		if (!user) {
 			hx_printf_prefix(htlc, chat, INFOPREFIX,
 					 "%s: no such nickname %s\n", argv[0], name);
@@ -1073,7 +1073,7 @@ usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage %s <uid> <msg>\n", argv[
 			hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 			return;
 		}
-		user = hx_user_with_name(chat->user_list, (u_int8_t *)name);
+                user = hx_user_with_name(chat->user_list, name);
 		if (!user) {
 			hx_printf_prefix(htlc, chat, INFOPREFIX,
 					 "%s: no such nickname %s\n", argv[0], name);
@@ -1120,9 +1120,9 @@ hx_change_name_icon (struct htlc_conn *htlc, const char *name, u_int16_t icon)
 			len = 31;
 		memcpy(htlc->name, name, len);
 		htlc->name[len] = 0;
-	} else {
-                len = strlen((char *)htlc->name);
-	}
+        } else {
+                len = strlen(htlc->name);
+        }
 	if (icon)
 		htlc->icon = icon;
 	icon16 = htons(htlc->icon);
@@ -1695,7 +1695,7 @@ hx_connect (struct htlc_conn *htlc, const char *serverstr, u_int16_t port, const
 	hxd_files[s].conn.htlc = htlc;
 
         if (name)
-                strcpy((char *)htlc->name, name);
+                strcpy(htlc->name, name);
 	if (icon)
 		htlc->icon = icon;
 	htlc->fd = s;
@@ -1809,13 +1809,13 @@ hx_connect (struct htlc_conn *htlc, const char *serverstr, u_int16_t port, const
 		hlwrite(htlc, HTLC_HDR_LOGIN, 0, 4,
 			HTLC_DATA_ICON, 2, &icon16,
 			HTLC_DATA_LOGIN, llen, enclogin,
-			HTLC_DATA_PASSWORD, plen, encpass,
-                        HTLC_DATA_NAME, strlen((char *)htlc->name), htlc->name);
+                        HTLC_DATA_PASSWORD, plen, encpass,
+                        HTLC_DATA_NAME, strlen(htlc->name), htlc->name);
 	} else {
 		hlwrite(htlc, HTLC_HDR_LOGIN, 0, 3,
 			HTLC_DATA_ICON, 2, &icon16,
-			HTLC_DATA_LOGIN, llen, enclogin,
-                        HTLC_DATA_NAME, strlen((char *)htlc->name), htlc->name);
+                        HTLC_DATA_LOGIN, llen, enclogin,
+                        HTLC_DATA_NAME, strlen(htlc->name), htlc->name);
 	}
 }
 
@@ -1981,7 +1981,7 @@ rcv_task_user_list (struct htlc_conn *htlc, struct hx_chat *chat, int text)
 			memcpy(user->name, uh->name, nlen);
 			strip_ansi(user->name, nlen);
 			user->name[nlen] = 0;
-			if (!htlc->uid && !strcmp(user->name, htlc->name) && user->icon == htlc->icon) {
+                        if (!htlc->uid && !strcmp(user->name, htlc->name) && user->icon == htlc->icon) {
 				htlc->uid = user->uid;
 				htlc->color = user->color;
 				hx_output.status();
@@ -1993,8 +1993,8 @@ rcv_task_user_list (struct htlc_conn *htlc, struct hx_chat *chat, int text)
 		}
 	dh_end()
 	hx_output.user_list(htlc, chat);
-	if (slen)
-                hx_output.chat_subject(htlc, chat->cid, (char *)chat->subject);
+        if (slen)
+                hx_output.chat_subject(htlc, chat->cid, chat->subject);
 	if (text)
 		user_print(htlc, chat, 0, 0);
 }
@@ -2122,7 +2122,7 @@ COMMAND(chat)
 			hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 			return;
 		}
-		user = hx_user_with_name(chat->user_list, (u_int8_t *)argv[1]);
+                user = hx_user_with_name(chat->user_list, argv[1]);
 		if (!user) {
 			hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: no such nickname %s\n", argv[0], argv[1]);
 			return;
@@ -2161,7 +2161,7 @@ COMMAND(invite)
 			hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 			return;
 		}
-		user = hx_user_with_name(chat->user_list, (u_int8_t *)argv[2]);
+                user = hx_user_with_name(chat->user_list, argv[2]);
 		if (!user) {
 			hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: no such nickname\n", argv[2]);
 			return;
@@ -2172,7 +2172,7 @@ COMMAND(invite)
 }
 
 void
-hx_chat_join (struct htlc_conn *htlc, u_int32_t cid, u_int8_t *pass, u_int16_t passlen)
+hx_chat_join (struct htlc_conn *htlc, u_int32_t cid, const char *pass, u_int16_t passlen)
 {
 	struct hx_chat *chat;
 
@@ -2195,7 +2195,7 @@ hx_chat_join (struct htlc_conn *htlc, u_int32_t cid, u_int8_t *pass, u_int16_t p
 COMMAND(join)
 {
 	u_int32_t cid;
-	u_int8_t *pass;
+        char *pass;
 	u_int16_t passlen;
 
 	if (argc < 2) {
@@ -2351,7 +2351,7 @@ COMMAND(kick)
 				hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 				return;
 			}
-			user = hx_user_with_name(chat->user_list, (u_int8_t *)argv[i]);
+                        user = hx_user_with_name(chat->user_list, argv[i]);
 			if (!user) {
 				hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: no such nickname %s\n", argv[0], argv[i]);
 				return;
@@ -2390,7 +2390,7 @@ static void
 rcv_task_user_info (struct htlc_conn *htlc, u_int32_t uid, int text)
 {
 	u_int16_t ilen = 0, nlen = 0;
-	u_int8_t info[4096 + 1], name[32];
+        char info[4096 + 1], name[32];
 
 	name[0] = 0;
 	dh_start(htlc)
@@ -2446,7 +2446,7 @@ COMMAND(info)
 				hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 				return;
 			}
-			user = hx_user_with_name(chat->user_list, (u_int8_t *)argv[i]);
+                        user = hx_user_with_name(chat->user_list, argv[i]);
 			if (!user) {
 				hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: no such nickname %s\n", argv[0], argv[i]);
 				return;
@@ -2570,7 +2570,7 @@ COMMAND(type)
 						hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: null chat, not connected?\n", argv[0]);
 						return;
 					}
-					user = hx_user_with_name(chat->user_list, (u_int8_t *)opt.arg);
+                                        user = hx_user_with_name(chat->user_list, opt.arg);
 					if (!user) {
 						hx_printf_prefix(htlc, chat, INFOPREFIX, "%s: no such nickname %s\n", argv[0], opt.arg);
 						return;
@@ -2954,7 +2954,7 @@ expand_path (struct htlc_conn *htlc, struct hx_chat *chat, char *path, int len, 
             fh = (struct hl_filelist_hdr *)((char *)fh + flen + SIZEOF_HL_DATA_HDR)) {
 		L16NTOH(flen, &fh->len);
 		L32NTOH(fnlen, &fh->fnlen);
-		if (fnlen >= len && !strncmp(fh->fname, ent, len)) {
+                if (fnlen >= len && !strncmp((char *)fh->fname, ent, len)) {
 			if (ep) {
 				int i;
 	
@@ -2968,7 +2968,7 @@ expand_path (struct htlc_conn *htlc, struct hx_chat *chat, char *path, int len, 
 				epchr = 0;
 xxx:
 				if (last_cfl == cfl) {
-					r = snprintf(ambigbufp, sizeof(ambigbuf) - (ambigbufp - ambigbuf), "  %-16.*s", fnlen, fh->fname);
+                                        r = snprintf(ambigbufp, sizeof(ambigbuf) - (ambigbufp - ambigbuf), "  %-16.*s", fnlen, (char *)fh->fname);
 					if (!(r == -1 || sizeof(ambigbuf) <= (unsigned)(ambigbufp + r - ambigbuf))) {
 						ambigi++;
 						ambigbufp += r;
@@ -2984,7 +2984,7 @@ xxx:
 					ambig = 1;
 				goto xxx;
 			}
-			ep = fh->fname;
+                        ep = (char *)fh->fname;
 		}
 	}
 	if (!ep)
@@ -3116,7 +3116,7 @@ exists_remote (struct htlc_conn *htlc, char *path)
             fh = (struct hl_filelist_hdr *)((char *)fh + flen + SIZEOF_HL_DATA_HDR)) {
 		L16NTOH(flen, &fh->len);
 		L32NTOH(fnlen, &fh->fnlen);
-		if ((int)fnlen == len && !strncmp(fh->fname, ent, len))
+                if ((int)fnlen == len && !strncmp((char *)fh->fname, ent, len))
 			return 1;
 	}
 
@@ -3454,8 +3454,10 @@ static void
 rcv_task_file_getinfo (struct htlc_conn *htlc, void *ptr, int text)
 {
 	struct hl_hdr *h = (struct hl_hdr *)htlc->in.buf;
-	u_int8_t icon[4], type[32], crea[32], date_create[8], date_modify[8];
-	u_int8_t name[256], comment[256];
+        char icon[4];
+        char type[32], crea[32];
+        u_int8_t date_create[8], date_modify[8];
+        char name[256], comment[256];
 	u_int16_t nlen, clen, tlen;
 	u_int32_t size = 0;
 	char created[32], modified[32];
@@ -3671,7 +3673,7 @@ static void
 exec_ready_read (int fd)
 {
 	ssize_t r;
-	u_int8_t buf[0x4000];
+        char buf[0x4000];
 
 	r = read(fd, buf, sizeof(buf) - 1);
 	if (r == 0 || (r < 0 && errno != EINTR)) {
@@ -4438,7 +4440,7 @@ put_thread (void *__arg)
 {
 	struct htxf_conn *htxf = (struct htxf_conn *)__arg;
 	int s, f, retval = 0;
-	u_int8_t buf[512];
+        char buf[512];
 	struct hfsinfo fi;
 
 	s = htxf_connect(htxf);
@@ -5149,11 +5151,11 @@ tracker_ready_read (int s)
 {
 	u_int16_t port, nusers, nservers;
 #ifdef CONFIG_IPV6
-	unsigned char buf[HOSTLEN+1];
+        unsigned char buf[HOSTLEN+1];
 #else
-	unsigned char buf[16];
+        unsigned char buf[16];
 #endif
-	unsigned char name[512], desc[512];
+        char name[512], desc[512];
 	struct IN_ADDR a;
 	struct sigaction act, oldact;
 
@@ -5200,9 +5202,9 @@ tracker_ready_read (int s)
 #ifdef CONFIG_IPV6
 		inet_ntop(AFINET, (char *)&a, buf, sizeof(buf));
 #else
-		inet_ntoa_r(a, buf, sizeof(buf));
+                inet_ntoa_r(a, (char *)buf, sizeof(buf));
 #endif
-		hx_output.tracker_server_create(hxd_files[s].conn.htlc, buf, port, nusers, name, desc);
+                hx_output.tracker_server_create(hxd_files[s].conn.htlc, (char *)buf, port, nusers, name, desc);
 	}
 funk_dat:
 	hxd_fd_clr(s, FDR);

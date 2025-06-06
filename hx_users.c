@@ -45,17 +45,17 @@ hx_user_with_uid (struct hx_user *ulist, u_int32_t uid)
 }
 
 struct hx_user *
-hx_user_with_name (struct hx_user *ulist, u_int8_t *name)
+hx_user_with_name (struct hx_user *ulist, const char *name)
 {
         size_t ulen, uplen, nlen;
         struct hx_user *userp, *user = 0;
 
-        nlen = strlen((const char *)name);
+        nlen = strlen(name);
         for (userp = ulist->next; userp; userp = userp->next) {
-                if (!strncmp((const char *)userp->name, (const char *)name, nlen)) {
+                if (!strncmp(userp->name, name, nlen)) {
                         if (user) {
-                                ulen = strlen((const char *)user->name);
-                                uplen = strlen((const char *)userp->name);
+                                ulen = strlen(user->name);
+                                uplen = strlen(userp->name);
                                 if (!((uplen == nlen && ulen != nlen) || (ulen == nlen && uplen != nlen)))
                                         return 0;
                         }

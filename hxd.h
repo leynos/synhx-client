@@ -260,7 +260,7 @@ struct htlc_conn {
 
 	char rootdir[MAXPATHLEN], newsfile[MAXPATHLEN], dropbox[MAXPATHLEN];
 	u_int8_t userid[516];
-	u_int8_t name[32];
+        char name[32];
 	u_int8_t login[32];
 
 	u_int16_t nr_puts, put_limit, nr_gets, get_limit;
