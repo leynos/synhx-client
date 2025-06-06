@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           ./configure
-          make
+          make -j$(nproc)
 
       - name: Package binary
         run: |
