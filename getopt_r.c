@@ -871,8 +871,6 @@ getopt_r (argc, argv, optstring, opt)
 			     (int *) 0,
 			     0, opt);
 }
-
-#endif	/* Not ELIDE_CODE.  */
 
 #ifdef TEST
 
