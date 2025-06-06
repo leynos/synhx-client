@@ -27,7 +27,9 @@
 
 extern struct htlc_conn hx_htlc;
 
-extern char last_msg_nick[32];
+typedef char hx_string_t;
+
+extern hx_string_t last_msg_nick[32];
 
 extern u_int8_t dir_char;
 
@@ -182,7 +184,7 @@ struct hx_user {
 	u_int32_t uid;
 	u_int16_t icon;
 	u_int16_t color;
-        char name[32];
+       hx_string_t name[32];
 	int ignore;
 };
 
@@ -198,8 +200,8 @@ struct hx_chat {
 	struct hx_user __user_list;
 	struct hx_user *user_list;
 	struct hx_user *user_tail;
-        char subject[256];
-        char password[32];
+       hx_string_t subject[256];
+       hx_string_t password[32];
 	u_int16_t subjectlen;
 	u_int16_t passwordlen;
 };
