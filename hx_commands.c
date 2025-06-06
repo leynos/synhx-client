@@ -1834,9 +1834,14 @@ static struct option server_opts[] = {
 COMMAND(server)
 {
 	u_int16_t port = 0, icon = 0;
-	char *serverstr = 0, *portstr = 0, *login = 0, *pass = 0, *name = 0;
-	char *cipher = 0, *compress = 0;
-	struct opt_r opt;
+        char *serverstr = 0, *portstr = 0, *login = 0, *pass = 0, *name = 0;
+#ifdef CONFIG_CIPHER
+        char *cipher = 0;
+#endif
+#ifdef CONFIG_COMPRESS
+        char *compress = 0;
+#endif
+        struct opt_r opt;
 	int o, longind;
 	int secure = 1;
 
@@ -2261,9 +2266,8 @@ hx_set_password (struct htlc_conn *htlc, u_int32_t cid, const char *pass)
 
 COMMAND(subject)
 {
-	u_int32_t cid;
-	u_int16_t len;
-	char *s;
+        u_int32_t cid;
+        char *s;
 
 	if (argc < 2) {
 usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <subject>\n", argv[0]);
@@ -2274,16 +2278,14 @@ usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <subject>\n", argv[0
 		s = str + (cmd_arg(1, str) >> 16);
 		if (!*s)
 			goto usage;
-		len = strlen(s);
-		hx_set_subject(htlc, cid, s);
+                hx_set_subject(htlc, cid, s);
 	}
 }
 
 COMMAND(password)
 {
-	u_int32_t cid;
-	u_int16_t len;
-	char *s;
+        u_int32_t cid;
+        char *s;
 
 	if (argc < 2) {
 usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <pass>\n", argv[0]);
@@ -2294,8 +2296,7 @@ usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <pass>\n", argv[0]);
 		s = str + (cmd_arg(1, str) >> 16);
 		if (!*s)
 			goto usage;
-		len = strlen(s);
-		hx_set_password(htlc, cid, s);
+                hx_set_password(htlc, cid, s);
 	}
 }
 
@@ -3004,19 +3005,16 @@ glob_remote (char *path, int *npaths)
 {
 	struct cached_filelist *cfl;
 	struct hl_filelist_hdr *fh;
-	char *p, *ent, *patternbuf, *pathbuf, **paths;
-	int n, len, flen, blen = 0;
-
-	ent = path;
+        char *p, *patternbuf, *pathbuf, **paths;
+        int n, len, flen, blen = 0;
 	len = strlen(path);
-	for (p = path + len - 1; p >= path; p--)
-		if (*p == dir_char) {
-			ent = p+1;
-			while (p > path && *p == dir_char)
-				p--;
-			blen = (p+1) - path;
-			break;
-		}
+        for (p = path + len - 1; p >= path; p--)
+                if (*p == dir_char) {
+                        while (p > path && *p == dir_char)
+                                p--;
+                        blen = (p+1) - path;
+                        break;
+                }
 
 	patternbuf = xmalloc(blen + 1);
 	memcpy(patternbuf, path, blen);
@@ -4813,8 +4811,7 @@ COMMAND(put)
 	char *lpath, *rpath, buf[MAXPATHLEN];
 	int i;
 	size_t j;
-	glob_t g;
-	struct htxf_conn *htxf;
+        glob_t g;
 
 	if (argc < 2) {
 		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <file> [file2...]\n", argv[0]);
@@ -4833,8 +4830,8 @@ COMMAND(put)
 		for (j = 0; j < (size_t)g.gl_pathc; j++) {
 			lpath = g.gl_pathv[j];
 			snprintf(buf, MAXPATHLEN, "%s%c%s", htlc->rootdir, dir_char, basename(lpath));
-			rpath = buf;
-			htxf = xfer_new(htlc, lpath, rpath, XFER_PUT);
+                        rpath = buf;
+                        xfer_new(htlc, lpath, rpath, XFER_PUT);
 		}
 		globfree(&g);
 	}
