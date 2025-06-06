@@ -3,7 +3,8 @@
 This project uses [Artistic Style](https://astyle.sourceforge.net/) to keep the C
 code consistently formatted. The configuration file `.astylerc` at the repository
 root defines the style, which approximates LLVM guidelines using two-space
-indents and the OTBS brace style.
+indents and the OTBS brace style. **Run all astyle commands from the repository
+root so this configuration file can be located correctly.**
 
 ### Checking Formatting
 Run Artistic Style in *dry run* mode to see what changes would be made without
