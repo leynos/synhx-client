@@ -247,7 +247,7 @@ suffix (const char *path)
 static void
 suffix_type_creator (char *buf, const char *path)
 {
-	u_int8_t *tc = UNKNOWN_TYPECREA;
+        const char *tc = UNKNOWN_TYPECREA;
 	char *suff;
 
 	if (!(suff = suffix(path)))
@@ -281,7 +281,7 @@ cpy:
 }
 
 void
-type_creator (u_int8_t *buf, const char *path)
+type_creator (char *buf, const char *path)
 {
 	char infopath[MAXPATHLEN];
 	struct stat sb;

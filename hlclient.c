@@ -906,10 +906,10 @@ hotline_client_init (int argc, char **argv)
 	memset(&hx_htlc, 0, sizeof(struct htlc_conn));
 	INITLOCK_HTXF(&hx_htlc);
 	hx_htlc.icon = 500;
-	if (user)
-		strncpy(hx_htlc.name, user, 31);
-	else
-		strcpy(hx_htlc.name, "Evaluation 0wn3r");
+        if (user)
+                strncpy((char *)hx_htlc.name, user, 31);
+        else
+                strcpy((char *)hx_htlc.name, "Evaluation 0wn3r");
 
 	gen_command_hash();
 

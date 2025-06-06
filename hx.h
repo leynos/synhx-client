@@ -86,7 +86,7 @@ extern void hx_get_user_info (struct htlc_conn *htlc, u_int32_t uid, int text);
 extern void hx_kick_user (struct htlc_conn *htlc, u_int32_t uid, u_int16_t ban);
 extern void hx_chat_user (struct htlc_conn *htlc, u_int32_t uid);
 extern void hx_chat_part (struct htlc_conn *htlc, struct hx_chat *chat);
-extern void hx_chat_join (struct htlc_conn *htlc, u_int32_t cid, u_int8_t *pass, u_int16_t passlen);
+extern void hx_chat_join (struct htlc_conn *htlc, u_int32_t cid, const char *pass, u_int16_t passlen);
 extern void hx_chat_invite (struct htlc_conn *htlc, u_int32_t cid, u_int32_t uid);
 extern void hx_set_subject (struct htlc_conn *htlc, u_int32_t cid, const char *subject);
 extern void hx_list_dir (struct htlc_conn *htlc, const char *path,
@@ -182,14 +182,14 @@ struct hx_user {
 	u_int32_t uid;
 	u_int16_t icon;
 	u_int16_t color;
-	u_int8_t name[32];
+        char name[32];
 	int ignore;
 };
 
 extern struct hx_user *hx_user_new (struct hx_user **utailp);
 extern void hx_user_delete (struct hx_user **utailp, struct hx_user *user);
 extern struct hx_user *hx_user_with_uid (struct hx_user *ulist, u_int32_t uid);
-extern struct hx_user *hx_user_with_name (struct hx_user *ulist, u_int8_t *name);
+extern struct hx_user *hx_user_with_name (struct hx_user *ulist, const char *name);
 
 struct hx_chat {
 	struct hx_chat *next, *prev;
@@ -198,8 +198,8 @@ struct hx_chat {
 	struct hx_user __user_list;
 	struct hx_user *user_list;
 	struct hx_user *user_tail;
-	u_int8_t subject[256];
-	u_int8_t password[32];
+        char subject[256];
+        char password[32];
 	u_int16_t subjectlen;
 	u_int16_t passwordlen;
 };
@@ -227,7 +227,7 @@ struct output_functions {
 	void (*mode_clear)(void);
 	void (*chat)(struct htlc_conn *htlc, u_int32_t cid, char *chat, u_int16_t len);
 	void (*chat_subject)(struct htlc_conn *htlc, u_int32_t cid, const char *subject);
-	void (*chat_password)(struct htlc_conn *htlc, u_int32_t cid, const u_int8_t *pass);
+    void (*chat_password)(struct htlc_conn *htlc, u_int32_t cid, const char *pass);
 	void (*chat_invite)(struct htlc_conn *htlc, u_int32_t cid, u_int32_t uid, const char *name);
 	void (*chat_delete)(struct htlc_conn *htlc, struct hx_chat *chat);
 	void (*msg)(struct htlc_conn *htlc, u_int32_t uid, const char *name, const char *msgbuf, u_int16_t msglen);

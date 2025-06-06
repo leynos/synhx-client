@@ -1540,7 +1540,7 @@ chat_subject (struct htlc_conn *htlc, u_int32_t cid, const char *subject)
 }
 
 static void
-chat_password (struct htlc_conn *htlc, u_int32_t cid, const u_int8_t *pass)
+chat_password (struct htlc_conn *htlc, u_int32_t cid, const char *pass)
 {
 	struct hx_chat *chat;
 
