@@ -21,3 +21,5 @@ acconfig.c           config.h.in          configure.in          gtk_hlist.c
 hal.c                hotline.h            hlwrite.c             hx_commands.c
 hx_gtk.c             hx_tty.c             hxd.c                 hxd.h
 Makefile.in          version.c
+
+For code formatting instructions, see docs/AstyleUsage.md.
