@@ -9,7 +9,7 @@ This manual describes how to build, configure and use the **hx** client (also kn
 2. Run `make` to compile the client.
 3. Launch with `./hx`.
 
-The TTY build requires GNU readline. If the library is missing, obtain it from the GNU FTP site.
+The TTY build requires GNU Readline. If the library is missing, obtain it from the GNU FTP site.
 
 ### GTK+ Version
 1. Run `./configure --enable-gtk` to enable the graphical frontend.
