@@ -11,17 +11,17 @@
 typedef RC4_KEY rc4_state;
 
 struct blowfish_state {
-	BF_KEY state;
-	unsigned char ivec[8];
-	int num;
+  BF_KEY state;
+  unsigned char ivec[8];
+  int num;
 };
 
 typedef struct blowfish_state blowfish_state;
 
 struct idea_state {
-	IDEA_KEY_SCHEDULE state;
-	unsigned char ivec[8];
-	int num;
+  IDEA_KEY_SCHEDULE state;
+  unsigned char ivec[8];
+  int num;
 };
 
 typedef struct idea_state idea_state;

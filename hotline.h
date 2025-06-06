@@ -2,183 +2,183 @@
 #define _HOTLINE_H
 
 #if defined(HAVE_CONFIG_H)
-#include "config.h"
+  #include "config.h"
 #endif
 #include <sys/types.h>
 
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__)
-#define ZERO_SIZE_ARRAY_SIZE	0
+  #define ZERO_SIZE_ARRAY_SIZE	0
 #else
-#define ZERO_SIZE_ARRAY_SIZE	1
+  #define ZERO_SIZE_ARRAY_SIZE	1
 #endif
 
 struct hl_net_hdr {
-	u_int32_t	type,
-			trans;
-	u_int32_t	flag;
-	u_int32_t	len;
-	u_int16_t	src,
-			dst;
-	u_int16_t	hc;
-	u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
+  u_int32_t	type,
+            trans;
+  u_int32_t	flag;
+  u_int32_t	len;
+  u_int16_t	src,
+            dst;
+  u_int16_t	hc;
+  u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
 };
 
 struct hl_hdr {
-	u_int32_t	type,
-			trans;
-	u_int32_t	flag;
-	u_int32_t	len,
-			len2;
-	u_int16_t	hc;
-	u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
+  u_int32_t	type,
+            trans;
+  u_int32_t	flag;
+  u_int32_t	len,
+            len2;
+  u_int16_t	hc;
+  u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
 };
 
 struct hl_data_hdr {
-	u_int16_t	type,
-			len;
-	u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
+  u_int16_t	type,
+            len;
+  u_int8_t	data[ZERO_SIZE_ARRAY_SIZE];
 };
 
 struct htxf_hdr {
-	u_int32_t	magic,
-			ref,
-			len,
-			unknown;
+  u_int32_t	magic,
+            ref,
+            len,
+            unknown;
 };
 
 struct hl_filelist_hdr {
-	u_int16_t	type,
-			len;
-	u_int32_t	ftype,
-			fcreator;
-	u_int32_t	fsize,
-			unknown,
-			fnlen;
-	u_int8_t	fname[ZERO_SIZE_ARRAY_SIZE];
+  u_int16_t	type,
+            len;
+  u_int32_t	ftype,
+            fcreator;
+  u_int32_t	fsize,
+            unknown,
+            fnlen;
+  u_int8_t	fname[ZERO_SIZE_ARRAY_SIZE];
 };
 
 struct hl_userlist_hdr {
-	u_int16_t	type,
-			len;
-	u_int16_t	uid,
-			icon,
-			color,
-			nlen;
-	u_int8_t	name[ZERO_SIZE_ARRAY_SIZE];
+  u_int16_t	type,
+            len;
+  u_int16_t	uid,
+            icon,
+            color,
+            nlen;
+  u_int8_t	name[ZERO_SIZE_ARRAY_SIZE];
 };
 
 struct htrk_hdr {
-	u_int16_t version;
-	u_int16_t port;
-	u_int16_t nusers;
-	u_int16_t __reserved0;
-	u_int32_t id;
+  u_int16_t version;
+  u_int16_t port;
+  u_int16_t nusers;
+  u_int16_t __reserved0;
+  u_int32_t id;
 };
 
 #ifndef WORDS_BIGENDIAN
-#if defined(__BIG_ENDIAN__)
-#define WORDS_BIGENDIAN 1
-#endif
+  #if defined(__BIG_ENDIAN__)
+    #define WORDS_BIGENDIAN 1
+  #endif
 #endif
 
 struct hl_access_bits {
-#if WORDS_BIGENDIAN
-	u_int32_t delete_files:1,
-		  upload_files:1,
-		  download_files:1,
-		  rename_files:1,
-		  move_files:1,
-		  create_folders:1,
-		  delete_folders:1,
-		  rename_folders:1,
-		  move_folders:1,
-		  read_chat:1,
-		  send_chat:1,
-		  __reserved0:3,
-		  create_users:1,
-		  delete_users:1,
-		  read_users:1,
-		  modify_users:1,
-		  __reserved1:2,
-		  read_news:1,
-		  post_news:1,
-		  disconnect_users:1,
-		  cant_be_disconnected:1,
-		  get_user_info:1,
-		  upload_anywhere:1,
-		  use_any_name:1,
-		  dont_show_agreement:1,
-		  comment_files:1,
-		  comment_folders:1,
-		  view_drop_boxes:1,
-		  make_aliases:1,
-		  can_broadcast:1,
-		  __reserved2:7,
-		  __reserved3:24;
-#else /* assumes little endian */
-	u_int32_t rename_folders:1,
-		  delete_folders:1,
-		  create_folders:1,
-		  move_files:1,
-		  rename_files:1,
-		  download_files:1,
-		  upload_files:1,
-		  delete_files:1,
-		  delete_users:1,
-		  create_users:1,
-		  __reserved0:3,
-		  send_chat:1,
-		  read_chat:1,
-		  move_folders:1,
-		  cant_be_disconnected:1,
-		  disconnect_users:1,
-		  post_news:1,
-		  read_news:1,
-		  __reserved1:2,
-		  modify_users:1,
-		  read_users:1,
-		  make_aliases:1,
-		  view_drop_boxes:1,
-		  comment_folders:1,
-		  comment_files:1,
-		  dont_show_agreement:1,
-		  use_any_name:1,
-		  upload_anywhere:1,
-		  get_user_info:1,
-		  __reserved2:7,
-		  can_broadcast:1,
-		  __reserved3:24;
-#endif
+  #if WORDS_BIGENDIAN
+  u_int32_t delete_files:1,
+            upload_files:1,
+            download_files:1,
+            rename_files:1,
+            move_files:1,
+            create_folders:1,
+            delete_folders:1,
+            rename_folders:1,
+            move_folders:1,
+            read_chat:1,
+            send_chat:1,
+            __reserved0:3,
+            create_users:1,
+            delete_users:1,
+            read_users:1,
+            modify_users:1,
+            __reserved1:2,
+            read_news:1,
+            post_news:1,
+            disconnect_users:1,
+            cant_be_disconnected:1,
+            get_user_info:1,
+            upload_anywhere:1,
+            use_any_name:1,
+            dont_show_agreement:1,
+            comment_files:1,
+            comment_folders:1,
+            view_drop_boxes:1,
+            make_aliases:1,
+            can_broadcast:1,
+            __reserved2:7,
+            __reserved3:24;
+  #else /* assumes little endian */
+  u_int32_t rename_folders:1,
+            delete_folders:1,
+            create_folders:1,
+            move_files:1,
+            rename_files:1,
+            download_files:1,
+            upload_files:1,
+            delete_files:1,
+            delete_users:1,
+            create_users:1,
+            __reserved0:3,
+            send_chat:1,
+            read_chat:1,
+            move_folders:1,
+            cant_be_disconnected:1,
+            disconnect_users:1,
+            post_news:1,
+            read_news:1,
+            __reserved1:2,
+            modify_users:1,
+            read_users:1,
+            make_aliases:1,
+            view_drop_boxes:1,
+            comment_folders:1,
+            comment_files:1,
+            dont_show_agreement:1,
+            use_any_name:1,
+            upload_anywhere:1,
+            get_user_info:1,
+            __reserved2:7,
+            can_broadcast:1,
+            __reserved3:24;
+  #endif
 };
 
 struct hl_user_data {
-	u_int32_t magic;
-	struct hl_access_bits access;
-	u_int8_t pad[516];
-	u_int16_t nlen;
-	u_int8_t name[134];
-	u_int16_t llen;
-	u_int8_t login[34];
-	u_int16_t plen;
-	u_int8_t password[32];
+  u_int32_t magic;
+  struct hl_access_bits access;
+  u_int8_t pad[516];
+  u_int16_t nlen;
+  u_int8_t name[134];
+  u_int16_t llen;
+  u_int8_t login[34];
+  u_int16_t plen;
+  u_int8_t password[32];
 };
 
 struct hl_bookmark {
-	u_int32_t magic;
-	u_int16_t version;
-	u_int8_t fill1[128];
-	u_int16_t login_len;
-	u_int8_t login[32];
-	u_int16_t password_len;
-	u_int8_t password[32];
-	u_int16_t addr_len;
-	u_int8_t addr[32];
-	u_int8_t fill2[40];
-	/* this is openhl specific */
-	u_int16_t icon;
-	u_int16_t nick_len;
-	u_int8_t nick[32];
-	u_int8_t fill3[148];
+  u_int32_t magic;
+  u_int16_t version;
+  u_int8_t fill1[128];
+  u_int16_t login_len;
+  u_int8_t login[32];
+  u_int16_t password_len;
+  u_int8_t password[32];
+  u_int16_t addr_len;
+  u_int8_t addr[32];
+  u_int8_t fill2[40];
+  /* this is openhl specific */
+  u_int16_t icon;
+  u_int16_t nick_len;
+  u_int8_t nick[32];
+  u_int8_t fill3[148];
 };
 
 #define HL_BOOKMARK_MAGIC 'HTsc'

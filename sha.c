@@ -2,19 +2,21 @@
  *
  * Copyright (C) 1995, A.M. Kuchling
  *
- * Distribute and use freely; there are no restrictions on further 
- * dissemination and usage except those imposed by the laws of your 
+ * Distribute and use freely; there are no restrictions on further
+ * dissemination and usage except those imposed by the laws of your
  * country of residence.
  *
- * Adapted to pike and some cleanup by Niels Möller.
- */
 
-/* $Id: sha.c,v 1.1.1.1 2001-09-03 18:53:25 devinteske Exp $ */
+  #include "config.h"
 
-/* SHA: NIST's Secure Hash Algorithm */
+  for(i=0; i<SHA_DIGESTLEN; i++) {
+  }
+  for(i=0; i < src->index; i++) {
+  }
+                                    ROTL( 1, ( W[ i & 15 ] ^ W[ (i - 14) & 15 ] ^ \
+                                        W[ (i - 8) & 15 ] ^ W[ (i - 3) & 15 ] ) ) )
+  ( e += ROTL( 5, a ) + f( b, c, d ) + k + data, b = ROTL( 30, b ) )
 
-/* Based on SHA code originally posted to sci.crypt by Peter Gutmann
-   in message <30ajo5$oe8@ccu2.auckland.ac.nz>.
    Modified to test for endianness on creation of SHA objects by AMK.
    Also, the original specification of SHA was found to have a weakness
    by NSA/NIST.  This code implements the fixed version of SHA.
@@ -252,21 +254,22 @@ static void sha_transform(struct sha_ctx *ctx, u_int32_t *data )
 #if 1
 
 #ifndef EXTRACT_UCHAR
-#define EXTRACT_UCHAR(p)  (*(unsigned char *)(p))
+  #define EXTRACT_UCHAR(p)  (*(unsigned char *)(p))
 #endif
 
 #define STRING2INT(s) ((((((EXTRACT_UCHAR(s) << 8)    \
-			 | EXTRACT_UCHAR(s+1)) << 8)  \
-			 | EXTRACT_UCHAR(s+2)) << 8)  \
-			 | EXTRACT_UCHAR(s+3))
+                           | EXTRACT_UCHAR(s+1)) << 8)  \
+                         | EXTRACT_UCHAR(s+2)) << 8)  \
+                       | EXTRACT_UCHAR(s+3))
 #else
 u_int32_t STRING2INT(u_int8_t *s)
 {
   u_int32_t r;
   int i;
-  
-  for (i = 0, r = 0; i < 4; i++, s++)
+
+  for (i = 0, r = 0; i < 4; i++, s++) {
     r = (r << 8) | *s;
+  }
   return r;
 }
 #endif
@@ -275,61 +278,60 @@ static void sha_block(struct sha_ctx *ctx, u_int8_t *block)
 {
   u_int32_t data[SHA_DATALEN];
   int i;
-  
+
   /* Update block count */
-  if (!++ctx->count_l)
+  if (!++ctx->count_l) {
     ++ctx->count_h;
+  }
 
   /* Endian independent conversion */
-  for (i = 0; i<SHA_DATALEN; i++, block += 4)
+  for (i = 0; i<SHA_DATALEN; i++, block += 4) {
     data[i] = STRING2INT(block);
+  }
 
   sha_transform(ctx, data);
 }
 
 void sha_update(struct sha_ctx *ctx, u_int8_t *buffer, u_int32_t len)
 {
-  if (ctx->index)
-    { /* Try to fill partial block */
-      unsigned left = SHA_DATASIZE - ctx->index;
-      if (len < left)
-	{
-	  memcpy(ctx->block + ctx->index, buffer, len);
-	  ctx->index += len;
-	  return; /* Finished */
-	}
-      else
-	{
-	  memcpy(ctx->block + ctx->index, buffer, left);
-	  sha_block(ctx, ctx->block);
-	  buffer += left;
-	  len -= left;
-	}
+  if (ctx->index) {
+    /* Try to fill partial block */
+    unsigned left = SHA_DATASIZE - ctx->index;
+    if (len < left) {
+      memcpy(ctx->block + ctx->index, buffer, len);
+      ctx->index += len;
+      return; /* Finished */
+    } else {
+      memcpy(ctx->block + ctx->index, buffer, left);
+      sha_block(ctx, ctx->block);
+      buffer += left;
+      len -= left;
     }
-  while (len >= SHA_DATASIZE)
-    {
-      sha_block(ctx, buffer);
-      buffer += SHA_DATASIZE;
-      len -= SHA_DATASIZE;
-    }
+  }
+  while (len >= SHA_DATASIZE) {
+    sha_block(ctx, buffer);
+    buffer += SHA_DATASIZE;
+    len -= SHA_DATASIZE;
+  }
   if ((ctx->index = len))     /* This assignment is intended */
     /* Buffer leftovers */
+  {
     memcpy(ctx->block, buffer, len);
+  }
 }
 
 void sha_digest(struct sha_ctx *ctx, u_int8_t *s)
 {
   int i;
 
-  for (i = 0; i < SHA_DIGESTLEN; i++)
-    {
-      *s++ =         ctx->digest[i] >> 24;
-      *s++ = 0xff & (ctx->digest[i] >> 16);
-      *s++ = 0xff & (ctx->digest[i] >> 8);
-      *s++ = 0xff &  ctx->digest[i];
-    }
+  for (i = 0; i < SHA_DIGESTLEN; i++) {
+    *s++ =         ctx->digest[i] >> 24;
+    *s++ = 0xff & (ctx->digest[i] >> 16);
+    *s++ = 0xff & (ctx->digest[i] >> 8);
+    *s++ = 0xff &  ctx->digest[i];
+  }
 }
-	  
+
 /* Final wrapup - pad to SHA_DATASIZE-byte boundary with the bit pattern
    1 0* (64-bit count of bits processed, MSB-first) */
 
@@ -338,33 +340,37 @@ void sha_final(u_int8_t *s, struct sha_ctx *ctx)
   u_int32_t data[SHA_DATALEN];
   int i;
   int words;
-  
+
   i = ctx->index;
   /* Set the first char of padding to 0x80.  This is safe since there is
      always at least one byte free */
   ctx->block[i++] = 0x80;
 
   /* Fill rest of word */
-  for( ; i & 3; i++)
+  for( ; i & 3; i++) {
     ctx->block[i] = 0;
+  }
 
   /* i is now a multiple of the word size 4 */
   words = i >> 2;
-  for (i = 0; i < words; i++)
+  for (i = 0; i < words; i++) {
     data[i] = STRING2INT(ctx->block + 4*i);
-  
-  if (words > (SHA_DATALEN-2))
-    { /* No room for length in this block. Process it and
-       * pad with another one */
-      for (i = words ; i < SHA_DATALEN; i++)
-	data[i] = 0;
-      sha_transform(ctx, data);
-      for (i = 0; i < (SHA_DATALEN-2); i++)
-	data[i] = 0;
-    }
-  else
-    for (i = words ; i < SHA_DATALEN - 2; i++)
+  }
+
+  if (words > (SHA_DATALEN-2)) {
+    /* No room for length in this block. Process it and
+     * pad with another one */
+    for (i = words ; i < SHA_DATALEN; i++) {
       data[i] = 0;
+    }
+    sha_transform(ctx, data);
+    for (i = 0; i < (SHA_DATALEN-2); i++) {
+      data[i] = 0;
+    }
+  } else
+    for (i = words ; i < SHA_DATALEN - 2; i++) {
+      data[i] = 0;
+    }
   /* Theres 512 = 2^9 bits in one block */
   data[SHA_DATALEN-2] = (ctx->count_h << 9) | (ctx->count_l >> 23);
   data[SHA_DATALEN-1] = (ctx->count_l << 9) | (ctx->index << 3);
@@ -376,50 +382,54 @@ void sha_final(u_int8_t *s, struct sha_ctx *ctx)
 int
 sha_fd (int fd, size_t maxlen, u_int8_t *md)
 {
-	struct sha_ctx ctx;
+  struct sha_ctx ctx;
 #define BLOCKSIZE 4096
-	char buffer[BLOCKSIZE + 72];
-	size_t sum;
+  char buffer[BLOCKSIZE + 72];
+  size_t sum;
 
-	sha_init(&ctx);
+  sha_init(&ctx);
 
-	for (;;) {
-		ssize_t n;
+  for (;;) {
+    ssize_t n;
 
-		sum = 0;
+    sum = 0;
 
-		if (maxlen) {
-			do {
-				n = read(fd, buffer + sum, (BLOCKSIZE - sum) > maxlen ? maxlen : (BLOCKSIZE - sum));
-				sum += n;
-				maxlen -= n;
-				if (!maxlen)
-					goto add_last;
-			} while (sum < BLOCKSIZE && n > 0);
-		} else {
-			do {
-				n = read(fd, buffer + sum, BLOCKSIZE - sum);
-				sum += n;
-			} while (sum < BLOCKSIZE && n > 0);
-		}
+    if (maxlen) {
+      do {
+        n = read(fd, buffer + sum, (BLOCKSIZE - sum) > maxlen ? maxlen : (BLOCKSIZE - sum));
+        sum += n;
+        maxlen -= n;
+        if (!maxlen) {
+          goto add_last;
+        }
+      } while (sum < BLOCKSIZE && n > 0);
+    } else {
+      do {
+        n = read(fd, buffer + sum, BLOCKSIZE - sum);
+        sum += n;
+      } while (sum < BLOCKSIZE && n > 0);
+    }
 
-		if (n == -1) {
-			if (errno == EINTR)
-				continue;
-			return 1;
-		}
+    if (n == -1) {
+      if (errno == EINTR) {
+        continue;
+      }
+      return 1;
+    }
 
-		if (n == 0)
-			break;
+    if (n == 0) {
+      break;
+    }
 
-		sha_update(&ctx, buffer, sum);
-	}
+    sha_update(&ctx, buffer, sum);
+  }
 
 add_last:
-	if (sum > 0)
-		sha_update(&ctx, buffer, sum);
+  if (sum > 0) {
+    sha_update(&ctx, buffer, sum);
+  }
 
-	sha_final(md, &ctx);
+  sha_final(md, &ctx);
 
-	return 0;
+  return 0;
 }

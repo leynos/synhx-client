@@ -20,7 +20,7 @@
 #ifndef _GETOPT_H
 
 #ifndef __need_getopt
-# define _GETOPT_H 1
+  #define _GETOPT_H 1
 #endif
 
 #ifdef	__cplusplus
@@ -61,22 +61,22 @@ extern int optopt;
 #ifndef __need_getopt
 /* Used for communication from `getopt_r' to the caller. */
 struct opt_r {
-	char *arg;
-	int ind;
-	int opt;
+  char *arg;
+  int ind;
+  int opt;
 
-/* Callers store zero here to inhibit the error message `getopt' prints
-   for unrecognized options.  */
-	void (*err_printf)(const char *, ...);
+  /* Callers store zero here to inhibit the error message `getopt' prints
+     for unrecognized options.  */
+  void (*err_printf)(const char *, ...);
 
-/* Internal only.  Users should not reference these directly.  */
-	char *__nextchar;
+  /* Internal only.  Users should not reference these directly.  */
+  char *__nextchar;
 
-/* Describe the part of ARGV that contains non-options that have
-   been skipped.  `first_nonopt' is the index in ARGV of the first of them;
-   `last_nonopt' is the index after the last of them.  */
-	int __first_nonopt;
-	int __last_nonopt;
+  /* Describe the part of ARGV that contains non-options that have
+     been skipped.  `first_nonopt' is the index in ARGV of the first of them;
+     `last_nonopt' is the index after the last of them.  */
+  int __first_nonopt;
+  int __last_nonopt;
 };
 #endif
 
@@ -102,13 +102,12 @@ struct opt_r {
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */
 
-struct option
-{
-# if defined __STDC__ && __STDC__
+struct option {
+  # if defined __STDC__ && __STDC__
   const char *name;
-# else
+  # else
   char *name;
-# endif
+  # endif
   /* has_arg can't be an enum because some compilers complain about
      type mismatches in all the code that assumes it is an int.  */
   int has_arg;
@@ -165,25 +164,25 @@ extern int getopt_r ();
 
 # ifndef __need_getopt
 extern int getopt_long (int __argc, char *const *__argv, const char *__shortopts,
-		        const struct option *__longopts, int *__longind);
+                        const struct option *__longopts, int *__longind);
 extern int getopt_long_r (int __argc, char *const *__argv, const char *__shortopts,
-			  const struct option *__longopts, int *__longind, struct opt_r *__opt);
+                          const struct option *__longopts, int *__longind, struct opt_r *__opt);
 extern int getopt_long_only (int __argc, char *const *__argv,
-			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind);
+                             const char *__shortopts,
+                             const struct option *__longopts, int *__longind);
 extern int getopt_long_only_r (int __argc, char *const *__argv,
-			       const char *__shortopts,
-			       const struct option *__longopts, int *__longind, struct opt_r *__opt);
+                               const char *__shortopts,
+                               const struct option *__longopts, int *__longind, struct opt_r *__opt);
 
 /* Internal only.  Users should not call these directly.  */
 extern int _getopt_internal (int __argc, char *const *__argv,
-			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind,
-			     int __long_only);
+                             const char *__shortopts,
+                             const struct option *__longopts, int *__longind,
+                             int __long_only);
 extern int _getopt_r_internal (int __argc, char *const *__argv,
-			       const char *__shortopts,
-		               const struct option *__longopts, int *__longind,
-			       int __long_only, struct opt_r *__opt);
+                               const char *__shortopts,
+                               const struct option *__longopts, int *__longind,
+                               int __long_only, struct opt_r *__opt);
 # endif
 #else /* not __STDC__ */
 extern int getopt ();
