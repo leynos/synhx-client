@@ -17,7 +17,7 @@ Binaries are compiled on both **Ubuntu** and **Fedora** runners. Each job perfor
 
 ## Packaging
 
-After compilation the resulting `hx` binary is archived into `hx-ubuntu-latest.tar.gz` or `hx-fedora-latest.tar.gz` depending on the operating system.
+After compilation the resulting `hx` binary is archived into `hx-ubuntu-latest-$TAG.tar.gz` or `hx-fedora-latest-$TAG.tar.gz` (where `$TAG` is the version tag such as `v1.0.0`).
 
 ## Release upload
 

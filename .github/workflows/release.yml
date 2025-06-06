@@ -11,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
-      matrix:
+          tar czvf hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz -C dist .
+          files: hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz
         os: [ubuntu-latest, fedora-latest]
 
     steps:
