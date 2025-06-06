@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 #if defined(HAVE_CONFIG_H)
-#include "config.h"
+  #include "config.h"
 #endif
 
 extern void *xmalloc (size_t size);

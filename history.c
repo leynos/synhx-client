@@ -25,7 +25,7 @@
    you can call.  I think I have done that. */
 
 #if defined (HAVE_CONFIG_H)
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include <stdio.h>
@@ -46,47 +46,47 @@
 /* **************************************************************** */
 
 struct history {
-	/* An array of HIST_ENTRY.  This is where we store the history. */
-	HIST_ENTRY **the_history;
+  /* An array of HIST_ENTRY.  This is where we store the history. */
+  HIST_ENTRY **the_history;
 
-	/* Non-zero means that we have enforced a limit on the amount of
-	   history that we save. */
-	int history_stifled;
+  /* Non-zero means that we have enforced a limit on the amount of
+     history that we save. */
+  int history_stifled;
 
-	/* If HISTORY_STIFLED is non-zero, then this is the maximum number of
-	   entries to remember. */
-	int max_input_history;
+  /* If HISTORY_STIFLED is non-zero, then this is the maximum number of
+     entries to remember. */
+  int max_input_history;
 
-	/* The current location of the interactive history pointer.  Just makes
-	   life easier for outside callers. */
-	int history_offset;
+  /* The current location of the interactive history pointer.  Just makes
+     life easier for outside callers. */
+  int history_offset;
 
-	/* The number of strings currently stored in the history list. */
-	int history_length;
+  /* The number of strings currently stored in the history list. */
+  int history_length;
 
-	/* The current number of slots allocated to the input_history. */
-	int history_size;
+  /* The current number of slots allocated to the input_history. */
+  int history_size;
 
-	/* The logical `base' of the history array.  It defaults to 1. */
-	int history_base;
+  /* The logical `base' of the history array.  It defaults to 1. */
+  int history_base;
 };
 
 void *
 history_new (void)
 {
-	struct history *history;
+  struct history *history;
 
-	history = xmalloc(sizeof(struct history));
-	memset(history, 0, sizeof(struct history));
-	history->history_base = 1;
+  history = xmalloc(sizeof(struct history));
+  memset(history, 0, sizeof(struct history));
+  history->history_base = 1;
 
-	return (void *)history;
+  return (void *)history;
 }
 
 /* Return the current HISTORY_STATE of the history. */
 HISTORY_STATE *
 history_get_history_state (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
   HISTORY_STATE *state;
@@ -97,8 +97,9 @@ history_get_history_state (__history)
   state->length = history->history_length;
   state->size = history->history_size;
   state->flags = 0;
-  if (history->history_stifled)
+  if (history->history_stifled) {
     state->flags |= HS_STIFLED;
+  }
 
   return (state);
 }
@@ -106,8 +107,8 @@ history_get_history_state (__history)
 /* Set the state of the current history array to STATE. */
 void
 history_set_history_state (__history, state)
-     void *__history;
-     HISTORY_STATE *state;
+void *__history;
+HISTORY_STATE *state;
 {
   struct history *history = (struct history *)__history;
 
@@ -115,15 +116,16 @@ history_set_history_state (__history, state)
   history->history_offset = state->offset;
   history->history_length = state->length;
   history->history_size = state->size;
-  if (state->flags & HS_STIFLED)
+  if (state->flags & HS_STIFLED) {
     history->history_stifled = 1;
+  }
 }
 
 /* Begin a session in which the history functions might be used.  This
    initializes interactive variables. */
 void
 using_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
@@ -134,15 +136,16 @@ using_history (__history)
    This just adds up the lengths of the_history->lines. */
 int
 history_total_bytes (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
   register int i, result;
 
   result = 0;
 
-  for (i = 0; history->the_history && history->the_history[i]; i++)
+  for (i = 0; history->the_history && history->the_history[i]; i++) {
     result += strlen (history->the_history[i]->line);
+  }
 
   return (result);
 }
@@ -151,7 +154,7 @@ history_total_bytes (__history)
    looking at now.  In this implementation, it returns history_offset. */
 int
 where_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
@@ -162,23 +165,24 @@ where_history (__history)
    Returns zero if POS is out of range, else non-zero. */
 int
 history_set_pos (__history, pos)
-     void *__history;
-     int pos;
+void *__history;
+int pos;
 {
   struct history *history = (struct history *)__history;
 
-  if (pos > history->history_length || pos < 0 || !history->the_history)
+  if (pos > history->history_length || pos < 0 || !history->the_history) {
     return (0);
+  }
   history->history_offset = pos;
   return (1);
 }
- 
+
 /* Return the current history array.  The caller has to be carefull, since this
    is the actual array of data, and could be bashed or made corrupt easily.
    The array is terminated with a NULL pointer. */
 HIST_ENTRY **
 history_list (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
@@ -189,13 +193,13 @@ history_list (__history)
    history_offset.  If there is no entry there, return a NULL pointer. */
 HIST_ENTRY *
 current_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
   return ((history->history_offset == history->history_length) || history->the_history == 0)
-		? (HIST_ENTRY *)NULL
-		: history->the_history[history->history_offset];
+         ? (HIST_ENTRY *)NULL
+         : history->the_history[history->history_offset];
 }
 
 /* Back up history_offset to the previous history entry, and return
@@ -203,11 +207,12 @@ current_history (__history)
    a NULL pointer. */
 HIST_ENTRY *
 previous_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
-  return history->history_offset ? history->the_history[--history->history_offset] : (HIST_ENTRY *)NULL;
+  return history->history_offset ? history->the_history[--history->history_offset] :
+         (HIST_ENTRY *)NULL;
 }
 
 /* Move history_offset forward to the next history entry, and return
@@ -215,80 +220,75 @@ previous_history (__history)
    NULL pointer. */
 HIST_ENTRY *
 next_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
-  return (history->history_offset == history->history_length) ? (HIST_ENTRY *)NULL : history->the_history[++history->history_offset];
+  return (history->history_offset == history->history_length) ? (HIST_ENTRY *)NULL :
+         history->the_history[++history->history_offset];
 }
 
 /* Return the history entry which is logically at OFFSET in the history array.
    OFFSET is relative to history_base. */
 HIST_ENTRY *
 history_get (__history, offset)
-     void *__history;
-     int offset;
+void *__history;
+int offset;
 {
   struct history *history = (struct history *)__history;
   int local_index;
 
   local_index = offset - history->history_base;
   return (local_index >= history->history_length || local_index < 0 || !history->the_history)
-		? (HIST_ENTRY *)NULL
-		: history->the_history[local_index];
+         ? (HIST_ENTRY *)NULL
+         : history->the_history[local_index];
 }
 
 /* Place STRING at the end of the history list.  The data field
    is  set to NULL. */
 void
 add_history (__history, string)
-     void *__history;
-     char *string;
+void *__history;
+char *string;
 {
   struct history *history = (struct history *)__history;
   HIST_ENTRY *temp;
 
-  if (history->history_stifled && (history->history_length == history->max_input_history))
-    {
-      register int i;
+  if (history->history_stifled && (history->history_length == history->max_input_history)) {
+    register int i;
 
-      /* If the history is stifled, and history_length is zero,
-	 and it equals max_input_history, we don't save items. */
-      if (history->history_length == 0)
-	return;
-
-      /* If there is something in the slot, then remove it. */
-      if (history->the_history[0])
-	{
-	  xfree (history->the_history[0]->line);
-	  xfree (history->the_history[0]);
-	}
-
-      /* Copy the rest of the entries, moving down one slot. */
-      for (i = 0; i < history->history_length; i++)
-	history->the_history[i] = history->the_history[i + 1];
-
-      history->history_base++;
+    /* If the history is stifled, and history_length is zero,
+    and it equals max_input_history, we don't save items. */
+    if (history->history_length == 0) {
+      return;
     }
-  else
-    {
-      if (history->history_size == 0)
-	{
-	  history->history_size = DEFAULT_HISTORY_GROW_SIZE;
-	  history->the_history = (HIST_ENTRY **)xmalloc (history->history_size * sizeof (HIST_ENTRY *));
-	  history->history_length = 1;
-	}
-      else
-	{
-	  if (history->history_length == (history->history_size - 1))
-	    {
-	      history->history_size += DEFAULT_HISTORY_GROW_SIZE;
-	      history->the_history = (HIST_ENTRY **)
-		xrealloc (history->the_history, history->history_size * sizeof (HIST_ENTRY *));
-	    }
-	  history->history_length++;
-	}
+
+    /* If there is something in the slot, then remove it. */
+    if (history->the_history[0]) {
+      xfree (history->the_history[0]->line);
+      xfree (history->the_history[0]);
     }
+
+    /* Copy the rest of the entries, moving down one slot. */
+    for (i = 0; i < history->history_length; i++) {
+      history->the_history[i] = history->the_history[i + 1];
+    }
+
+    history->history_base++;
+  } else {
+    if (history->history_size == 0) {
+      history->history_size = DEFAULT_HISTORY_GROW_SIZE;
+      history->the_history = (HIST_ENTRY **)xmalloc (history->history_size * sizeof (HIST_ENTRY *));
+      history->history_length = 1;
+    } else {
+      if (history->history_length == (history->history_size - 1)) {
+        history->history_size += DEFAULT_HISTORY_GROW_SIZE;
+        history->the_history = (HIST_ENTRY **)
+                               xrealloc (history->the_history, history->history_size * sizeof (HIST_ENTRY *));
+      }
+      history->history_length++;
+    }
+  }
 
   temp = (HIST_ENTRY *)xmalloc (sizeof (HIST_ENTRY));
   temp->line = xstrdup (string);
@@ -303,17 +303,18 @@ add_history (__history, string)
    invalid WHICH, a NULL pointer is returned. */
 HIST_ENTRY *
 replace_history_entry (__history, which, line, data)
-     void *__history;
-     int which;
-     char *line;
-     histdata_t data;
+void *__history;
+int which;
+char *line;
+histdata_t data;
 {
   struct history *history = (struct history *)__history;
   HIST_ENTRY *temp = (HIST_ENTRY *)xmalloc (sizeof (HIST_ENTRY));
   HIST_ENTRY *old_value;
 
-  if (which >= history->history_length)
+  if (which >= history->history_length) {
     return ((HIST_ENTRY *)NULL);
+  }
 
   old_value = history->the_history[which];
 
@@ -329,24 +330,24 @@ replace_history_entry (__history, which, line, data)
    and containing structure. */
 HIST_ENTRY *
 remove_history (__history, which)
-     void *__history;
-     int which;
+void *__history;
+int which;
 {
   struct history *history = (struct history *)__history;
   HIST_ENTRY *return_value;
 
-  if (which >= history->history_length || !history->history_length)
+  if (which >= history->history_length || !history->history_length) {
     return_value = (HIST_ENTRY *)NULL;
-  else
-    {
-      register int i;
-      return_value = history->the_history[which];
+  } else {
+    register int i;
+    return_value = history->the_history[which];
 
-      for (i = which; i < history->history_length; i++)
-	history->the_history[i] = history->the_history[i + 1];
-
-      history->history_length--;
+    for (i = which; i < history->history_length; i++) {
+      history->the_history[i] = history->the_history[i + 1];
     }
+
+    history->history_length--;
+  }
 
   return (return_value);
 }
@@ -354,57 +355,56 @@ remove_history (__history, which)
 /* Stifle the history list, remembering only MAX number of lines. */
 void
 stifle_history (__history, max)
-     void *__history;
-     int max;
+void *__history;
+int max;
 {
   struct history *history = (struct history *)__history;
 
-  if (max < 0)
+  if (max < 0) {
     max = 0;
+  }
 
-  if (history->history_length > max)
-    {
-      register int i, j;
+  if (history->history_length > max) {
+    register int i, j;
 
-      /* This loses because we cannot free the data. */
-      for (i = 0, j = history->history_length - max; i < j; i++)
-	{
-	  xfree (history->the_history[i]->line);
-	  xfree (history->the_history[i]);
-	}
-
-      history->history_base = i;
-      for (j = 0, i = history->history_length - max; j < max; i++, j++)
-	history->the_history[j] = history->the_history[i];
-      history->the_history[j] = (HIST_ENTRY *)NULL;
-      history->history_length = j;
+    /* This loses because we cannot free the data. */
+    for (i = 0, j = history->history_length - max; i < j; i++) {
+      xfree (history->the_history[i]->line);
+      xfree (history->the_history[i]);
     }
+
+    history->history_base = i;
+    for (j = 0, i = history->history_length - max; j < max; i++, j++) {
+      history->the_history[j] = history->the_history[i];
+    }
+    history->the_history[j] = (HIST_ENTRY *)NULL;
+    history->history_length = j;
+  }
 
   history->history_stifled = 1;
   history->max_input_history = max;
 }
 
-/* Stop stifling the history.  This returns the previous amount the 
+/* Stop stifling the history.  This returns the previous amount the
    history was stifled by.  The value is positive if the history was
    stifled,  negative if it wasn't. */
 int
 unstifle_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
-  if (history->history_stifled)
-    {
-      history->history_stifled = 0;
-      return (-history->max_input_history);
-    }
+  if (history->history_stifled) {
+    history->history_stifled = 0;
+    return (-history->max_input_history);
+  }
 
   return (history->max_input_history);
 }
 
 int
 history_is_stifled (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
 
@@ -413,18 +413,17 @@ history_is_stifled (__history)
 
 void
 clear_history (__history)
-     void *__history;
+void *__history;
 {
   struct history *history = (struct history *)__history;
   register int i;
 
   /* This loses because we cannot free the data. */
-  for (i = 0; i < history->history_length; i++)
-    {
-      xfree (history->the_history[i]->line);
-      xfree (history->the_history[i]);
-      history->the_history[i] = (HIST_ENTRY *)NULL;
-    }
+  for (i = 0; i < history->history_length; i++) {
+    xfree (history->the_history[i]->line);
+    xfree (history->the_history[i]);
+    history->the_history[i] = (HIST_ENTRY *)NULL;
+  }
 
   history->history_offset = history->history_length = 0;
 }
