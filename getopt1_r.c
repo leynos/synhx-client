@@ -17,111 +17,101 @@
    License along with the GNU C Library; see the file COPYING.LIB.  If not,
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+
+
+#ifndef NULL
 #endif
 
-#include "getopt.h"
+int getopt_long_r(argc, argv, options, long_options, opt_index, opt)
+int argc;
+char *const *argv;
+const char *options;
+const struct option *long_options;
+int *opt_index;
+struct opt_r *opt;
+  return _getopt_r_internal(argc, argv, options, long_options, opt_index, 0,
+                            opt);
 
-#if !defined __STDC__ || !__STDC__
-/* This is a separate conditional since some stdc systems
-   reject `defined (const)'.  */
-#ifndef const
-#define const
-#endif
-#endif
+int getopt_long_only_r(argc, argv, options, long_options, opt_index, opt)
+int argc;
+char *const *argv;
+const char *options;
+const struct option *long_options;
+int *opt_index;
+struct opt_r *opt;
+  return _getopt_r_internal(argc, argv, options, long_options, opt_index, 1,
+                            opt);
 
-#include <stdio.h>
+#endif /* Not ELIDE_CODE.  */
+int main(argc, argv)
+int argc;
+char **argv;
+  while (1) {
+    int this_option_optind = opt.ind ? opt.ind : 1;
+    int option_index = 0;
+    static struct option long_options[] = {
+        {"add", 1, 0, 0},     {"append", 0, 0, 0}, {"delete", 1, 0, 0},
+        {"verbose", 0, 0, 0}, {"create", 0, 0, 0}, {"file", 1, 0, 0},
+        {0, 0, 0, 0}};
 
-/* Comment out all this code if we are using the GNU C Library, and are not
-   actually compiling the library itself.  This code is part of the GNU C
-   Library, but also included in many other GNU distributions.  Compiling
-   and linking in this code is a waste when using the GNU C library
-   (especially if it is a shared library).  Rather than having every GNU
-   program understand `configure --with-gnu-libc' and omit the object files,
-   it is simpler to just do this in the source for each such file.  */
+    c = getopt_long_r(argc, argv, "abc:d:0123456789", long_options,
+                      &option_index, &opt);
+    if (c == -1)
+      break;
 
-#define GETOPT_R_INTERFACE_VERSION 2
-#if !defined _LIBC && defined __GLIBC__ && __GLIBC__ >= 2
-#include <gnu-versions.h>
-#if _GNU_GETOPT_R_INTERFACE_VERSION == GETOPT_R_INTERFACE_VERSION
-#define ELIDE_CODE
-#endif
-#endif
+    switch (c) {
+    case 0:
+      printf("option %s", long_options[option_index].name);
+      if (opt.arg)
+        printf(" with arg %s", opt.arg);
+      printf("\n");
+      break;
 
-#ifndef ELIDE_CODE
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      if (digit_optind != 0 && digit_optind != this_option_optind)
+        printf("digits occur in two different argv-elements.\n");
+      digit_optind = this_option_optind;
+      printf("option %c\n", c);
+      break;
 
+    case 'a':
+      printf("option a\n");
+      break;
 
-/* This needs to come after some library #include
-   to get __GNU_LIBRARY__ defined.  */
-#ifdef __GNU_LIBRARY__
-#include <stdlib.h>
-#endif
+    case 'b':
+      printf("option b\n");
+      break;
 
-#ifndef	NULL
-#define NULL 0
-#endif
+    case 'c':
+      printf("option c with value `%s'\n", opt.arg);
+      break;
 
-int
-getopt_long_r (argc, argv, options, long_options, opt_index, opt)
-     int argc;
-     char *const *argv;
-     const char *options;
-     const struct option *long_options;
-     int *opt_index;
-     struct opt_r *opt;
-{
-  return _getopt_r_internal (argc, argv, options, long_options, opt_index, 0, opt);
-}
+    case 'd':
+      printf("option d with value `%s'\n", opt.arg);
+      break;
 
-/* Like getopt_long, but '-' as well as '--' can indicate a long option.
-   If an option that starts with '-' (not '--') doesn't match a long option,
-   but does match a short option, it is parsed as a short option
-   instead.  */
+    case '?':
+      break;
 
-int
-getopt_long_only_r (argc, argv, options, long_options, opt_index, opt)
-     int argc;
-     char *const *argv;
-     const char *options;
-     const struct option *long_options;
-     int *opt_index;
-     struct opt_r *opt;
-{
-  return _getopt_r_internal (argc, argv, options, long_options, opt_index, 1, opt);
-}
-
-
-#endif	/* Not ELIDE_CODE.  */
-
-#ifdef TEST
-
-#include <stdio.h>
-
-int
-main (argc, argv)
-     int argc;
-     char **argv;
-{
-  int c;
-  int digit_optind = 0;
-  struct opt_r opt;
-
-  opt.ind = 0;
-  while (1)
-    {
-      int this_option_optind = opt.ind ? opt.ind : 1;
-      int option_index = 0;
-      static struct option long_options[] =
-      {
-	{"add", 1, 0, 0},
-	{"append", 0, 0, 0},
-	{"delete", 1, 0, 0},
-	{"verbose", 0, 0, 0},
-	{"create", 0, 0, 0},
-	{"file", 1, 0, 0},
-	{0, 0, 0, 0}
+    default:
+      printf("?? getopt returned character code 0%o ??\n", c);
+  }
+  if (opt.ind < argc) {
+    printf("non-option ARGV-elements: ");
+    while (opt.ind < argc)
+      printf("%s ", argv[opt.ind++]);
+    printf("\n");
+  }
+  exit(0);
       };
 
       c = getopt_long_r (argc, argv, "abc:d:0123456789",
