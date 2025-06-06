@@ -48,15 +48,15 @@ typedef struct _hist_entry {
 
 /* A structure used to pass the current state of the history stuff around. */
 typedef struct _hist_state {
-  HIST_ENTRY **entries;		/* Pointer to the entries themselves. */
-  int offset;			/* The location pointer within this array. */
-  int length;			/* Number of elements within this array. */
-  int size;			/* Number of slots allocated to this array. */
+  HIST_ENTRY **entries; /* Pointer to the entries themselves. */
+  int offset;           /* The location pointer within this array. */
+  int length;           /* Number of elements within this array. */
+  int size;             /* Number of slots allocated to this array. */
   int flags;
 } HISTORY_STATE;
 
 /* Flag values for the `flags' member of HISTORY_STATE. */
-#define HS_STIFLED	0x01
+#define HS_STIFLED 0x01
 
 /* Initialization and state management. */
 
@@ -112,7 +112,7 @@ extern HIST_ENTRY **history_list __P((void *));
 /* Returns the number which says what history element we are now
    looking at.  */
 extern int where_history __P((void *));
-  
+
 /* Return the history entry at the current position, as determined by
    history_offset.  If there is no entry there, return a NULL pointer. */
 extern HIST_ENTRY *current_history __P((void *));

@@ -6,9 +6,9 @@
 #include "config.h"
 #endif
 
-extern void *xmalloc (size_t size);
-extern void *xrealloc (void *ptr, size_t size);
-extern void xfree (void *ptr);
-extern char *xstrdup (const char *str);
+extern void *xmalloc(size_t size);
+extern void *xrealloc(void *ptr, size_t size);
+extern void xfree(void *ptr);
+extern char *xstrdup(const char *str);
 
 #endif /* ndef _XMALLOC_H */
