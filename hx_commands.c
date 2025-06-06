@@ -436,7 +436,7 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 		htlc->uid = user->uid;
 		htlc->icon = user->icon;
 		htlc->color = user->color;
-                strcpy((char *)htlc->name, (char *)user->name);
+                strcpy(htlc->name, user->name);
 		hx_output.status();
 	}
 }
@@ -1120,9 +1120,9 @@ hx_change_name_icon (struct htlc_conn *htlc, const char *name, u_int16_t icon)
 			len = 31;
 		memcpy(htlc->name, name, len);
 		htlc->name[len] = 0;
-	} else {
-                len = strlen((char *)htlc->name);
-	}
+        } else {
+                len = strlen(htlc->name);
+        }
 	if (icon)
 		htlc->icon = icon;
 	icon16 = htons(htlc->icon);
@@ -1695,7 +1695,7 @@ hx_connect (struct htlc_conn *htlc, const char *serverstr, u_int16_t port, const
 	hxd_files[s].conn.htlc = htlc;
 
         if (name)
-                strcpy((char *)htlc->name, name);
+                strcpy(htlc->name, name);
 	if (icon)
 		htlc->icon = icon;
 	htlc->fd = s;
@@ -1809,13 +1809,13 @@ hx_connect (struct htlc_conn *htlc, const char *serverstr, u_int16_t port, const
 		hlwrite(htlc, HTLC_HDR_LOGIN, 0, 4,
 			HTLC_DATA_ICON, 2, &icon16,
 			HTLC_DATA_LOGIN, llen, enclogin,
-			HTLC_DATA_PASSWORD, plen, encpass,
-                        HTLC_DATA_NAME, strlen((char *)htlc->name), htlc->name);
+                        HTLC_DATA_PASSWORD, plen, encpass,
+                        HTLC_DATA_NAME, strlen(htlc->name), htlc->name);
 	} else {
 		hlwrite(htlc, HTLC_HDR_LOGIN, 0, 3,
 			HTLC_DATA_ICON, 2, &icon16,
-			HTLC_DATA_LOGIN, llen, enclogin,
-                        HTLC_DATA_NAME, strlen((char *)htlc->name), htlc->name);
+                        HTLC_DATA_LOGIN, llen, enclogin,
+                        HTLC_DATA_NAME, strlen(htlc->name), htlc->name);
 	}
 }
 
@@ -1981,7 +1981,7 @@ rcv_task_user_list (struct htlc_conn *htlc, struct hx_chat *chat, int text)
 			memcpy(user->name, uh->name, nlen);
 			strip_ansi(user->name, nlen);
 			user->name[nlen] = 0;
-                        if (!htlc->uid && !strcmp(user->name, (char *)htlc->name) && user->icon == htlc->icon) {
+                        if (!htlc->uid && !strcmp(user->name, htlc->name) && user->icon == htlc->icon) {
 				htlc->uid = user->uid;
 				htlc->color = user->color;
 				hx_output.status();
