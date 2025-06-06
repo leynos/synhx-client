@@ -1824,64 +1824,89 @@ static struct option server_opts[] = {
 	{"password",	1, 0,	'p'},
 	{"nickname",	1, 0,	'n'},
 	{"icon",	1, 0,	'i'},
-	{"cipher",	1, 0,	'c'},
+#ifdef CONFIG_CIPHER
+        {"cipher",      1, 0,   'c'},
+#endif
 	{"old", 	0, 0,	'o'},
 	{"secure",	0, 0,	's'},
-	{"zip",		1, 0,	'z'},
+#ifdef CONFIG_COMPRESS
+        {"zip",         1, 0,   'z'},
+#endif
 	{0, 0, 0, 0}
 };
 
 COMMAND(server)
 {
 	u_int16_t port = 0, icon = 0;
-	char *serverstr = 0, *portstr = 0, *login = 0, *pass = 0, *name = 0;
-	char *cipher = 0, *compress = 0;
-	struct opt_r opt;
+       char *serverstr = 0, *portstr = 0, *login = 0, *pass = 0, *name = 0;
+#ifdef CONFIG_CIPHER
+       char *cipher = 0;
+#endif
+#ifdef CONFIG_COMPRESS
+       char *compress = 0;
+#endif
+        struct opt_r opt;
 	int o, longind;
 	int secure = 1;
 
 	opt.err_printf = err_printf;
-	opt.ind = 0;
-	while ((o = getopt_long_r(argc, argv, "l:p:n:i:c:z:os", server_opts, &longind, &opt)) != EOF) {
-		if (o == 0)
-			o = server_opts[longind].val;
-		switch (o) {
-			case 'l':
-				login = opt.arg;
-				break;
-			case 'p':
-				pass = opt.arg;
-				break;
-			case 'n':
-				name = opt.arg;
-				break;
-			case 'i':
-				icon = atou16(opt.arg);
-				break;
-			case 'c':
-				cipher = opt.arg;
-				break;
-			case 'o':
-				secure = 0;
-				break;
-			case 's':
-				secure = 1;
-				break;
-			case 'z':
-				compress = opt.arg;
-				break;
-			default:
-				goto usage;
-		}
-	}
-
+       opt.ind = 0;
 #ifdef CONFIG_CIPHER
-	if (cipher)
-		strncpy(htlc->cipheralg, cipher, sizeof(htlc->cipheralg)-1);
+#define CIPHER_OPT "c"
+#else
+#define CIPHER_OPT ""
 #endif
 #ifdef CONFIG_COMPRESS
-	if (compress)
-		strncpy(htlc->compressalg, compress, sizeof(htlc->compressalg)-1);
+#define COMPRESS_OPT "z"
+#else
+#define COMPRESS_OPT ""
+#endif
+       while ((o = getopt_long_r(argc, argv, "l:p:n:i" CIPHER_OPT COMPRESS_OPT ":os", server_opts, &longind, &opt)) != EOF) {
+               if (o == 0)
+                       o = server_opts[longind].val;
+               switch (o) {
+                       case 'l':
+                               login = opt.arg;
+                               break;
+                       case 'p':
+                               pass = opt.arg;
+                               break;
+                       case 'n':
+                               name = opt.arg;
+                               break;
+                       case 'i':
+                               icon = atou16(opt.arg);
+                               break;
+#ifdef CONFIG_CIPHER
+                       case 'c':
+                               cipher = opt.arg;
+                               break;
+#endif
+                       case 'o':
+                               secure = 0;
+                               break;
+                       case 's':
+                               secure = 1;
+                               break;
+#ifdef CONFIG_COMPRESS
+                       case 'z':
+                               compress = opt.arg;
+                               break;
+#endif
+               default:
+                       goto usage;
+               }
+       }
+#undef CIPHER_OPT
+#undef COMPRESS_OPT
+
+#ifdef CONFIG_CIPHER
+       if (cipher)
+               strncpy(htlc->cipheralg, cipher, sizeof(htlc->cipheralg) - 1);
+#endif
+#ifdef CONFIG_COMPRESS
+       if (compress)
+               strncpy(htlc->compressalg, compress, sizeof(htlc->compressalg) - 1);
 #endif
 
 	if (opt.ind < argc) {
@@ -2261,9 +2286,8 @@ hx_set_password (struct htlc_conn *htlc, u_int32_t cid, const char *pass)
 
 COMMAND(subject)
 {
-	u_int32_t cid;
-	u_int16_t len;
-	char *s;
+        u_int32_t cid;
+        char *s;
 
 	if (argc < 2) {
 usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <subject>\n", argv[0]);
@@ -2274,16 +2298,14 @@ usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <subject>\n", argv[0
 		s = str + (cmd_arg(1, str) >> 16);
 		if (!*s)
 			goto usage;
-		len = strlen(s);
-		hx_set_subject(htlc, cid, s);
+                hx_set_subject(htlc, cid, s);
 	}
 }
 
 COMMAND(password)
 {
-	u_int32_t cid;
-	u_int16_t len;
-	char *s;
+        u_int32_t cid;
+        char *s;
 
 	if (argc < 2) {
 usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <pass>\n", argv[0]);
@@ -2294,8 +2316,7 @@ usage:		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <pass>\n", argv[0]);
 		s = str + (cmd_arg(1, str) >> 16);
 		if (!*s)
 			goto usage;
-		len = strlen(s);
-		hx_set_password(htlc, cid, s);
+                hx_set_password(htlc, cid, s);
 	}
 }
 
@@ -3000,23 +3021,21 @@ xxx:
 }
 
 char **
-glob_remote (char *path, int *npaths)
+glob_remote(char *path, int *npaths)
 {
-	struct cached_filelist *cfl;
-	struct hl_filelist_hdr *fh;
-	char *p, *ent, *patternbuf, *pathbuf, **paths;
-	int n, len, flen, blen = 0;
-
-	ent = path;
-	len = strlen(path);
-	for (p = path + len - 1; p >= path; p--)
-		if (*p == dir_char) {
-			ent = p+1;
-			while (p > path && *p == dir_char)
-				p--;
-			blen = (p+1) - path;
-			break;
-		}
+        struct cached_filelist *cfl;
+        struct hl_filelist_hdr *fh;
+        char *p, *patternbuf;
+        char **paths;
+        int n, len, flen, blen = 0;
+        len = strlen(path);
+        for (p = path + len - 1; p >= path; p--)
+                if (*p == dir_char) {
+                        while (p > path && *p == dir_char)
+                                p--;
+                        blen = (p+1) - path;
+                        break;
+                }
 
 	patternbuf = xmalloc(blen + 1);
 	memcpy(patternbuf, path, blen);
@@ -3024,27 +3043,29 @@ glob_remote (char *path, int *npaths)
 
 	paths = 0;
 	n = 0;
-	for (cfl = cfl_list->next; cfl; cfl = cfl->next) {
-		u_int32_t fnlen;
-		if (fnmatch(patternbuf, cfl->path, FNM_NOESCAPE))
-			continue;
+       for (cfl = cfl_list->next; cfl; cfl = cfl->next) {
+               u_int32_t fnlen;
+               if (fnmatch(patternbuf, cfl->path, FNM_NOESCAPE))
+                       continue;
 
                for (fh = cfl->fh; (u_int32_t)((char *)fh - (char *)cfl->fh) < cfl->fhlen;
                     fh = (struct hl_filelist_hdr *)((char *)fh + flen + SIZEOF_HL_DATA_HDR)) {
-			L16NTOH(flen, &fh->len);
-			L32NTOH(fnlen, &fh->fnlen);
-			len = strlen(cfl->path) + 1 + fnlen + 1;
-			pathbuf = xmalloc(len);
-			snprintf(pathbuf, len, "%s%c%.*s", cfl->path[1] ? cfl->path : "", dir_char, (int)fnlen, fh->fname);
-			if (!fnmatch(path, pathbuf, FNM_NOESCAPE)) {
-				paths = xrealloc(paths, (n + 1) * sizeof(char *));
-				paths[n] = pathbuf;
-				n++;
-			} else {
-				xfree(pathbuf);
-			}
-		}
-	}
+                       char *pathbuf;
+
+                       L16NTOH(flen, &fh->len);
+                       L32NTOH(fnlen, &fh->fnlen);
+                       len = strlen(cfl->path) + 1 + fnlen + 1;
+                       pathbuf = xmalloc(len);
+                       snprintf(pathbuf, len, "%s%c%.*s", cfl->path[1] ? cfl->path : "", dir_char, (int)fnlen, fh->fname);
+                       if (!fnmatch(path, pathbuf, FNM_NOESCAPE)) {
+                               paths = xrealloc(paths, (n + 1) * sizeof(char *));
+                               paths[n] = pathbuf;
+                               n++;
+                       } else {
+                               xfree(pathbuf);
+                       }
+               }
+       }
 	if (n)
 		goto ret;
 
@@ -4813,8 +4834,7 @@ COMMAND(put)
 	char *lpath, *rpath, buf[MAXPATHLEN];
 	int i;
 	size_t j;
-	glob_t g;
-	struct htxf_conn *htxf;
+        glob_t g;
 
 	if (argc < 2) {
 		hx_printf_prefix(htlc, chat, INFOPREFIX, "usage: %s <file> [file2...]\n", argv[0]);
@@ -4833,8 +4853,8 @@ COMMAND(put)
 		for (j = 0; j < (size_t)g.gl_pathc; j++) {
 			lpath = g.gl_pathv[j];
 			snprintf(buf, MAXPATHLEN, "%s%c%s", htlc->rootdir, dir_char, basename(lpath));
-			rpath = buf;
-			htxf = xfer_new(htlc, lpath, rpath, XFER_PUT);
+                       rpath = buf;
+                       (void)xfer_new(htlc, lpath, rpath, XFER_PUT);
 		}
 		globfree(&g);
 	}

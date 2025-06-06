@@ -488,6 +488,7 @@ memory_copy (void *__dst, void *__src, unsigned int len)
 	u_int8_t *dh_data;		\
 	dh_len = ntohs(dh->len);	\
 	dh_data = dh->data;		\
+        (void)dh_data;             \
 	dh_type = ntohs(dh->type);	\
 	for (_pos = SIZEOF_HL_HDR, _max = (_htlc)->in.pos;	\
 	     _pos + SIZEOF_HL_DATA_HDR <= _max && dh_len <= ((_max - _pos) - SIZEOF_HL_DATA_HDR); \
