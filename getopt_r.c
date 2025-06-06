@@ -36,7 +36,6 @@
   contain conflicting prototypes for getopt.  */
   #include <stdlib.h>
   #include <unistd.h>
-  #include <unixlib.h>
   #if HAVE_STRING_H - 0
     #include <string.h>
   #endif
