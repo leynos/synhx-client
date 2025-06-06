@@ -369,7 +369,7 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 {
 	u_int32_t uid = 0, cid = 0, icon = 0, color = 0;
 	u_int16_t nlen = 0, got_color = 0;
-	u_int8_t name[32];
+        char name[32];
 	struct hx_chat *chat;
 	struct hx_user *user;
 	struct hl_hdr *h = (struct hl_hdr *)htlc->in.buf;
@@ -410,19 +410,19 @@ hx_rcv_user_change (struct htlc_conn *htlc)
 		user = hx_user_new(&chat->user_tail);
 		chat->nusers++;
 		user->uid = uid;
-                hx_output.user_create(htlc, chat, user, (char *)name, icon, color);
+                hx_output.user_create(htlc, chat, user, name, icon, color);
 		if (hx_output.user_create != hx_tty_output.user_create
 		    && tty_show_user_joins)
-                        hx_tty_output.user_create(htlc, chat, user, (char *)name, icon, color);
+                        hx_tty_output.user_create(htlc, chat, user, name, icon, color);
 		play_sound(snd_join);
 	} else {
 		if (!got_color)
 			color = user->color;
 		if (hx_output.user_change != hx_tty_output.user_change || !user->ignore)
-                        hx_output.user_change(htlc, chat, user, (char *)name, icon, color);
+                        hx_output.user_change(htlc, chat, user, name, icon, color);
 		if (hx_output.user_change != hx_tty_output.user_change
 		    && tty_show_user_changes && !user->ignore)
-                        hx_tty_output.user_change(htlc, chat, user, (char *)name, icon, color);
+                        hx_tty_output.user_change(htlc, chat, user, name, icon, color);
 	}
 	if (nlen) {
 		memcpy(user->name, name, nlen);
@@ -516,7 +516,7 @@ hx_rcv_chat_invite (struct htlc_conn *htlc)
 {
 	u_int32_t uid = 0, cid = 0;
 	u_int16_t nlen;
-	u_int8_t name[32];
+        char name[32];
 	struct hx_user *user = 0;
 	struct hx_chat *chat = hx_chat_with_cid(htlc, 0);
 
