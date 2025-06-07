@@ -1,6 +1,17 @@
 #include <stddef.h>
 #include "getopt.h"
 
+static int do_getopt_long_r(int argc, char *const argv[], const char *optstring,
+                            const struct option *longopts, int *longind,
+                            int long_only, struct opt_r *opt);
+
+int getopt_r(int argc, char *const argv[], const char *optstring,
+             struct opt_r *opt);
+
+int _getopt_r_internal(int argc, char *const argv[], const char *optstring,
+                       const struct option *longopts, int *longind,
+                       int long_only, struct opt_r *opt);
+
 static int
 do_getopt_long_r(int argc, char *const argv[], const char *optstring,
                  const struct option *longopts, int *longind, int long_only,
