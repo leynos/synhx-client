@@ -29,7 +29,8 @@ jobs:
       - name: Install build dependencies (Fedora)
         if: matrix.os == 'fedora-latest'
         run: |
-          sudo dnf install -y make automake gcc gcc-c++ kernel-devel autoconf libtool
+          sudo dnf install -y make automake gcc gcc-c++ kernel-devel \
+            autoconf libtool
 
       - name: Build
         run: |
