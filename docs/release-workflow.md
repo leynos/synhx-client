@@ -4,7 +4,9 @@ This project uses GitHub Actions to build release binaries for multiple Linux di
 
 ## Trigger
 
-The workflow runs whenever a tag matching `v*.*.*` is pushed. Example:
+The workflow runs whenever a tag matching `v*.*.*` is pushed. A safeguard within
+the workflow also verifies that the ref type is a tag so accidental branch
+pushes will not trigger a release. Example:
 
 ```bash
 git tag v1.0.0

@@ -1,13 +1,16 @@
 ---
 name: Release
 
-"on":
+# Trigger only on version tags like v1.2.3
+on:
   push:
     tags:
       - 'v*.*.*'
 
 jobs:
   build:
+    # Extra safeguard so the workflow will not run for non-tag pushes
+    if: github.ref_type == 'tag'
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
