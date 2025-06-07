@@ -25,12 +25,12 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential autoconf automake libtool
+          sudo apt-get install -y build-essential autoconf automake libtool libreadline-dev
 
       - name: Install build dependencies (Fedora)
         if: matrix.os == 'fedora-latest'
         run: |
-          sudo dnf install -y make automake gcc gcc-c++ kernel-devel autoconf libtool
+          sudo dnf install -y make automake gcc gcc-c++ kernel-devel autoconf libtool readline-devel
 
       - name: Build
         run: |
