@@ -1,3 +1,10 @@
+/*
+ * Wrapper functions for parsing long options with the reentrant
+ * getopt API.  These simply delegate to _getopt_r_internal defined
+ * in getopt_r.c so older code can call getopt_long_r() or
+ * getopt_long_only_r() and receive results in an opt_r structure.
+ */
+
 #include "getopt.h"
 
 extern int _getopt_r_internal(int argc, char *const argv[], const char *optstring,

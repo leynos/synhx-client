@@ -1,3 +1,12 @@
+/*
+ * Reentrant wrappers around the system getopt functions.
+ *
+ * These helpers call getopt(), getopt_long() or getopt_long_only()
+ * and copy the global results into an opt_r structure so callers do
+ * not rely on global variables.  They exist solely to satisfy code
+ * originally written against the old GNU reentrant API.
+ */
+
 #include <stddef.h>
 #include "getopt.h"
 
