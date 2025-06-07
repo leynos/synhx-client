@@ -55,30 +55,30 @@
  * An array of these make up a table of contents for the file.
  */
 struct hfs_hdr_descr {
-	u_int32_t	id;	/* The Apple assigned ID for the entry type */
-	u_int32_t	offset;	/* The offset to reach the entry */
-	u_int32_t	length;	/* The length of the entry */
+  u_int32_t	id;	/* The Apple assigned ID for the entry type */
+  u_int32_t	offset;	/* The offset to reach the entry */
+  u_int32_t	length;	/* The length of the entry */
 };
 
 #define SIZEOF_HFS_HDR_DESCR	12
 
-/* 
+/*
  * Default header layout for Netatalk and AppleDouble
  */
 struct hfs_dbl_hdr {
-	u_int32_t	magic;
-	u_int32_t	version;
-	u_int8_t	filler[16];
-	u_int16_t	entries;
-	u_int8_t	descrs[SIZEOF_HFS_HDR_DESCR * HFS_HDR_MAX];
+  u_int32_t	magic;
+  u_int32_t	version;
+  u_int8_t	filler[16];
+  u_int16_t	entries;
+  u_int8_t	descrs[SIZEOF_HFS_HDR_DESCR * HFS_HDR_MAX];
 };
 
 #define SIZEOF_HFS_DBL_HDR	26
 
 /* finder metadata for CAP */
 struct hfs_cap_info {
-	char            fi_fndr[32];	/* Finder's info */
-	u_int16_t	fi_attr;	/* AFP attributes (f=file/d=dir) */
+  char            fi_fndr[32];	/* Finder's info */
+  u_int16_t	fi_attr;	/* AFP attributes (f=file/d=dir) */
 #define HFS_AFP_INV		0x001   /* Invisible bit (f/d) */
 #define HFS_AFP_EXPFOLDER	0x002   /* exported folder (d) */
 #define HFS_AFP_MULTI		0x002   /* Multiuser bit (f) */
@@ -93,41 +93,41 @@ struct hfs_cap_info {
 #define HFS_AFP_DEI		0x100	/* Delete inhibit bit (f/d) */
 #define HFS_AFP_NOCOPY		0x400   /* Copy protect bit (f) */
 #define HFS_AFP_RDONLY		(HFS_AFP_WRI|HFS_AFP_RNI|HFS_AFP_DEI)
-	u_int8_t	fi_magic1;	/* Magic number: */
+  u_int8_t	fi_magic1;	/* Magic number: */
 #define HFS_CAP_MAGIC1		0xFF
-	u_int8_t	fi_version;	/* Version of this structure: */
+  u_int8_t	fi_version;	/* Version of this structure: */
 #define HFS_CAP_VERSION		0x10
-	u_int8_t	fi_magic;	/* Another magic number: */
+  u_int8_t	fi_magic;	/* Another magic number: */
 #define HFS_CAP_MAGIC		0xDA
-	u_int8_t	fi_bitmap;	/* Bitmap of which names are valid: */
+  u_int8_t	fi_bitmap;	/* Bitmap of which names are valid: */
 #define HFS_CAP_SHORTNAME	0x01
 #define HFS_CAP_LONGNAME	0x02
-	u_int8_t	fi_shortfilename[12+1];	/* "short name" (unused) */
-	u_int8_t	fi_macfilename[32+1];	/* Original (Macintosh) name */
-	u_int8_t	fi_comln;	/* Length of comment (always 0) */
-	u_int8_t	fi_comnt[200];	/* Finder comment (unused) */
-	/* optional: 	used by aufs only if compiled with USE_MAC_DATES */
-	u_int8_t	fi_datemagic;	/* Magic number for dates extension: */
+  u_int8_t	fi_shortfilename[12+1];	/* "short name" (unused) */
+  u_int8_t	fi_macfilename[32+1];	/* Original (Macintosh) name */
+  u_int8_t	fi_comln;	/* Length of comment (always 0) */
+  u_int8_t	fi_comnt[200];	/* Finder comment (unused) */
+  /* optional: 	used by aufs only if compiled with USE_MAC_DATES */
+  u_int8_t	fi_datemagic;	/* Magic number for dates extension: */
 #define HFS_CAP_DMAGIC		0xDA
-	u_int8_t	fi_datevalid;	/* Bitmap of which dates are valid: */
+  u_int8_t	fi_datevalid;	/* Bitmap of which dates are valid: */
 #define HFS_CAP_MDATE		0x01
 #define HFS_CAP_CDATE		0x02
-	u_int8_t	fi_ctime[4];	/* Creation date (in AFP format) */
-	u_int8_t	fi_mtime[4];	/* Modify date (in AFP format) */
-	u_int8_t	fi_utime[4];	/* Un*x time of last mtime change */
-	u_int8_t	pad;
+  u_int8_t	fi_ctime[4];	/* Creation date (in AFP format) */
+  u_int8_t	fi_mtime[4];	/* Modify date (in AFP format) */
+  u_int8_t	fi_utime[4];	/* Un*x time of last mtime change */
+  u_int8_t	pad;
 };
 
 #define SIZEOF_HFS_CAP_INFO	300
 
 struct hfsinfo {
-        char type[4];
-        char creator[4];
-	u_int32_t create_time;
-	u_int32_t modify_time;
-	u_int32_t rsrclen;
-	u_int32_t comlen;
-        char comment[200];
+  char type[4];
+  char creator[4];
+  u_int32_t create_time;
+  u_int32_t modify_time;
+  u_int32_t rsrclen;
+  u_int32_t comlen;
+  char comment[200];
 };
 
 extern int finderinfo_path (char *infopath, const char *path, struct stat *statbuf);

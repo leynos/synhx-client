@@ -26,3 +26,8 @@ Makefile.in          version.c
 
 See `docs/release-workflow.md` for details on how versioned releases are built and published using GitHub Actions.
 Each uploaded tarball includes the tag name in its filename, e.g. `hx-ubuntu-latest-v1.0.0.tar.gz`.
+
+## Code Formatting
+
+For code formatting instructions, see docs/AstyleUsage.md and run all commands
+from the repository root so `astyle` can locate `.astylerc`.

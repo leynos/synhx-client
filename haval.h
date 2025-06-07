@@ -11,7 +11,7 @@
  *       Y. Zheng, J. Pieprzyk and J. Seberry:
  *       ``HAVAL --- a one-way hashing algorithm with variable
  *       length of output'', Advances in Cryptology --- AUSCRYPT'92,
- *       Lecture Notes in Computer Science,  Vol.718, pp.83-104, 
+ *       Lecture Notes in Computer Science,  Vol.718, pp.83-104,
  *       Springer-Verlag, 1993.
  *
  *      This library provides routines to hash
@@ -36,7 +36,7 @@
  *                for his invaluable comments on the previous
  *                version of the code.
  *
- *      Copyright (C) 1996 by Yuliang Zheng.  All rights reserved. 
+ *      Copyright (C) 1996 by Yuliang Zheng.  All rights reserved.
  *      This program may not be sold or used as inducement to sell
  *      a  product without the  written  permission of the author.
  */
@@ -44,16 +44,18 @@
 typedef unsigned long int haval_word; /* a HAVAL word = 32 bits */
 
 typedef struct {
-	haval_word    count[2];                /* number of bits in a message */
-	haval_word    fingerprint[8];          /* current state of fingerprint */    
-	haval_word    block[32];               /* buffer for a 32-word block */ 
-	unsigned char remainder[32*4];         /* unhashed chars (No.<128) */   
-	int fptlen;	/* fingerprint length */
-	int passes;	/* number of passes, 3 or 4 or 5 */
+  haval_word    count[2];                /* number of bits in a message */
+  haval_word    fingerprint[8];          /* current state of fingerprint */
+  haval_word    block[32];               /* buffer for a 32-word block */
+  unsigned char remainder[32*4];         /* unhashed chars (No.<128) */
+  int fptlen;	/* fingerprint length */
+  int passes;	/* number of passes, 3 or 4 or 5 */
 } haval_state;
 
-extern void haval_buffer (unsigned char *buf, size_t len, unsigned char *fpt, int fptlen, int passes); /* hash a buffer */
-extern int  haval_fd (int fd, size_t maxlen, unsigned char *fpt, int fptlen, int passes);   /* hash a file */
+extern void haval_buffer (unsigned char *buf, size_t len, unsigned char *fpt, int fptlen,
+                          int passes); /* hash a buffer */
+extern int  haval_fd (int fd, size_t maxlen, unsigned char *fpt, int fptlen,
+                      int passes);   /* hash a file */
 extern void haval_start (haval_state *, int fptlen, int passes);            /* initialization */
 extern void haval_hash (haval_state *, unsigned char *, unsigned int);	/* updating routine */
 extern void haval_end (haval_state *, unsigned char *); /* finalization */

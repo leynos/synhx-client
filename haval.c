@@ -6,12 +6,12 @@
  *      collision-resistant property:
  *             It is computationally infeasible to find two or more
  *             messages that are hashed into the same fingerprint.
- *      
+ *
  *  Reference:
  *       Y. Zheng, J. Pieprzyk and J. Seberry:
  *       ``HAVAL --- a one-way hashing algorithm with variable
  *       length of output'', Advances in Cryptology --- AUSCRYPT'92,
- *       Lecture Notes in Computer Science,  Vol.718, pp.83-104, 
+ *       Lecture Notes in Computer Science,  Vol.718, pp.83-104,
  *       Springer-Verlag, 1993.
  *
  *  Descriptions:
@@ -58,13 +58,13 @@
  *                       PASS and FPTLEN replaced by fields in struct haval_state.
  *
  *
- *      Copyright (C) 1997 by Yuliang Zheng.  All rights reserved. 
+ *      Copyright (C) 1997 by Yuliang Zheng.  All rights reserved.
  *      This program may not be sold or used as inducement to sell
  *      a  product without the  written  permission of the author.
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+  #include "config.h"
 #endif
 
 #include <string.h>
@@ -73,7 +73,7 @@
 #include "haval.h"
 
 #if !defined(WORDS_BIGENDIAN) && defined(__powerpc__)
-#define WORDS_BIGENDIAN
+  #define WORDS_BIGENDIAN
 #endif
 
 #define VERSION    1                         /* current version number */
@@ -81,36 +81,36 @@
 static void haval_tailor (haval_state *);    /* folding the last output */
 
 static unsigned char padding[128] = {        /* constants for padding */
-0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 #define f_1(x6, x5, x4, x3, x2, x1, x0)              \
-           (((x1) & ((x0) ^ (x4))) ^ ((x2) & (x5)) ^ \
-            ((x3) & (x6)) ^ (x0))
+  (((x1) & ((x0) ^ (x4))) ^ ((x2) & (x5)) ^ \
+   ((x3) & (x6)) ^ (x0))
 
 #define f_2(x6, x5, x4, x3, x2, x1, x0)                               \
-           (((x2) & (((x1) & ~(x3)) ^ ((x4) & (x5)) ^ (x6) ^ (x0))) ^ \
-            ((x4) & ((x1) ^ (x5))) ^ ((x3) & (x5)) ^ (x0)) 
+  (((x2) & (((x1) & ~(x3)) ^ ((x4) & (x5)) ^ (x6) ^ (x0))) ^ \
+   ((x4) & ((x1) ^ (x5))) ^ ((x3) & (x5)) ^ (x0))
 
 #define f_3(x6, x5, x4, x3, x2, x1, x0)              \
-           (((x3) & (((x1) & (x2)) ^ (x6) ^ (x0))) ^ \
-            ((x1) & (x4)) ^ ((x2) & (x5)) ^ (x0))
+  (((x3) & (((x1) & (x2)) ^ (x6) ^ (x0))) ^ \
+   ((x1) & (x4)) ^ ((x2) & (x5)) ^ (x0))
 
 #define f_4(x6, x5, x4, x3, x2, x1, x0)                                   \
-           (((x4) & (((x5) & ~(x2)) ^ ((x3) & ~(x6)) ^ (x1) ^ (x6) ^ (x0))) ^ \
-            ((x3) & (((x1) & (x2)) ^ (x5) ^ (x6))) ^                        \
-            ((x2) & (x6)) ^ (x0))
+  (((x4) & (((x5) & ~(x2)) ^ ((x3) & ~(x6)) ^ (x1) ^ (x6) ^ (x0))) ^ \
+   ((x3) & (((x1) & (x2)) ^ (x5) ^ (x6))) ^                        \
+   ((x2) & (x6)) ^ (x0))
 
 #define f_5(x6, x5, x4, x3, x2, x1, x0)             \
-           (((x0) & ((((x1) & (x2)) & (x3)) ^ ~(x5))) ^ \
-            ((x1) & (x4)) ^ ((x2) & (x5)) ^ ((x3) & (x6)))
+  (((x0) & ((((x1) & (x2)) & (x3)) ^ ~(x5))) ^ \
+   ((x1) & (x4)) ^ ((x2) & (x5)) ^ ((x3) & (x6)))
 
 /*
  * Permutations phi_{i,j}, i=3,4,5, j=1,...,i.
@@ -143,48 +143,48 @@ static unsigned char padding[128] = {        /* constants for padding */
 #define rotate_right(x, n) (((x) >> (n)) | ((x) << (32-(n))))
 
 #define FF_1(x7, x6, x5, x4, x3, x2, x1, x0, w) {			\
-	register haval_word temp;					\
-	switch (state->passes) {					\
-		case 3: temp = f_1(x1, x0, x3, x5, x6, x2, x4); break;	\
-		case 4: temp = f_1(x2, x6, x1, x4, x5, x3, x0); break;	\
-	default:case 5: temp = f_1(x3, x4, x1, x0, x5, x2, x6); break;	\
-	}								\
-	(x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w);	\
-	}
+    register haval_word temp;					\
+    switch (state->passes) {					\
+      case 3: temp = f_1(x1, x0, x3, x5, x6, x2, x4); break;	\
+      case 4: temp = f_1(x2, x6, x1, x4, x5, x3, x0); break;	\
+    default:case 5: temp = f_1(x3, x4, x1, x0, x5, x2, x6); break;	\
+    }								\
+    (x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w);	\
+  }
 
 #define FF_2(x7, x6, x5, x4, x3, x2, x1, x0, w, c) {				\
-	register haval_word temp;						\
-	switch (state->passes) {						\
-		case 3: temp = f_2(x4, x2, x1, x0, x5, x3, x6); break;		\
-		case 4: temp = f_2(x3, x5, x2, x0, x1, x6, x4); break;		\
-	default:case 5: temp = f_2(x6, x2, x1, x0, x3, x4, x5); break;		\
-	}									\
-	(x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
-	}
+    register haval_word temp;						\
+    switch (state->passes) {						\
+      case 3: temp = f_2(x4, x2, x1, x0, x5, x3, x6); break;		\
+      case 4: temp = f_2(x3, x5, x2, x0, x1, x6, x4); break;		\
+    default:case 5: temp = f_2(x6, x2, x1, x0, x3, x4, x5); break;		\
+    }									\
+    (x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
+  }
 
 #define FF_3(x7, x6, x5, x4, x3, x2, x1, x0, w, c) {				\
-	register haval_word temp;						\
-	switch (state->passes) {						\
-		case 3: temp = f_3(x6, x1, x2, x3, x4, x5, x0); break;		\
-		case 4: temp = f_3(x1, x4, x3, x6, x0, x2, x5); break;		\
-	default:case 5: temp = f_3(x2, x6, x0, x4, x3, x1, x5); break;		\
-	}									\
-	(x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
-	}
+    register haval_word temp;						\
+    switch (state->passes) {						\
+      case 3: temp = f_3(x6, x1, x2, x3, x4, x5, x0); break;		\
+      case 4: temp = f_3(x1, x4, x3, x6, x0, x2, x5); break;		\
+    default:case 5: temp = f_3(x2, x6, x0, x4, x3, x1, x5); break;		\
+    }									\
+    (x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
+  }
 
 #define FF_4(x7, x6, x5, x4, x3, x2, x1, x0, w, c) {				\
-	register haval_word temp;						\
-	switch (state->passes) {						\
-		case 4: temp = f_4(x6, x4, x0, x5, x2, x1, x3); break;		\
-	default:case 5: temp = f_4(x1, x5, x3, x2, x0, x4, x6); break;		\
-	}									\
-	(x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
-	}
+    register haval_word temp;						\
+    switch (state->passes) {						\
+      case 4: temp = f_4(x6, x4, x0, x5, x2, x1, x3); break;		\
+    default:case 5: temp = f_4(x1, x5, x3, x2, x0, x4, x6); break;		\
+    }									\
+    (x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
+  }
 
 #define FF_5(x7, x6, x5, x4, x3, x2, x1, x0, w, c) {				\
-	register haval_word temp = f_5(x2, x5, x0, x6, x4, x3, x1);		\
-	(x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
-	}
+    register haval_word temp = f_5(x2, x5, x0, x6, x4, x3, x1);		\
+    (x7) = rotate_right(temp, 7) + rotate_right((x7), 11) + (w) + (c);	\
+  }
 
 /*
  * translate every four characters into a word.
@@ -192,41 +192,41 @@ static unsigned char padding[128] = {        /* constants for padding */
  */
 #if defined(__powerpc__)
 #define ch2uint(string, word, slen) {					\
-	unsigned char *sp = string, *send = string + slen;		\
-	haval_word *wp = word;						\
-	while (sp < send) {						\
-		__asm__ __volatile__ ("stwbrx %1,0,%2" : "=m" (*wp) :	\
-				      "r" (*(int *)sp), "r" (wp));	\
-		wp++;							\
-		sp += 4;						\
-	}								\
-}
+    unsigned char *sp = string, *send = string + slen;		\
+    haval_word *wp = word;						\
+    while (sp < send) {						\
+      __asm__ __volatile__ ("stwbrx %1,0,%2" : "=m" (*wp) :	\
+                            "r" (*(int *)sp), "r" (wp));	\
+      wp++;							\
+      sp += 4;						\
+    }								\
+  }
 #else
 #define ch2uint(string, word, slen) {      \
-  unsigned char *sp = string;              \
-  haval_word    *wp = word;                \
-  while (sp < (string) + (slen)) {         \
-    *wp++ =  (haval_word)*sp            |  \
-            ((haval_word)*(sp+1) <<  8) |  \
-            ((haval_word)*(sp+2) << 16) |  \
-            ((haval_word)*(sp+3) << 24);   \
-    sp += 4;                               \
-  }                                        \
-}
+    unsigned char *sp = string;              \
+    haval_word    *wp = word;                \
+    while (sp < (string) + (slen)) {         \
+      *wp++ =  (haval_word)*sp            |  \
+               ((haval_word)*(sp+1) <<  8) |  \
+               ((haval_word)*(sp+2) << 16) |  \
+               ((haval_word)*(sp+3) << 24);   \
+      sp += 4;                               \
+    }                                        \
+  }
 #endif
 
 /* translate each word into four characters */
 #define uint2ch(word, string, wlen) {              \
-  haval_word    *wp = word;                        \
-  unsigned char *sp = string;                      \
-  while (wp < (word) + (wlen)) {                   \
-    *(sp++) = (unsigned char)( *wp        & 0xFF); \
-    *(sp++) = (unsigned char)((*wp >>  8) & 0xFF); \
-    *(sp++) = (unsigned char)((*wp >> 16) & 0xFF); \
-    *(sp++) = (unsigned char)((*wp >> 24) & 0xFF); \
-    wp++;                                          \
-  }                                                \
-}
+    haval_word    *wp = word;                        \
+    unsigned char *sp = string;                      \
+    while (wp < (word) + (wlen)) {                   \
+      *(sp++) = (unsigned char)( *wp        & 0xFF); \
+      *(sp++) = (unsigned char)((*wp >>  8) & 0xFF); \
+      *(sp++) = (unsigned char)((*wp >> 16) & 0xFF); \
+      *(sp++) = (unsigned char)((*wp >> 24) & 0xFF); \
+      wp++;                                          \
+    }                                                \
+  }
 
 
 /* hash a buffer */
@@ -244,69 +244,73 @@ haval_buffer (unsigned char *buf, size_t len, unsigned char *fingerprint, int fp
 int
 haval_fd (int fd, size_t maxlen, unsigned char *fingerprint, int fptlen, int passes)
 {
-	haval_state state;
+  haval_state state;
 #define BLOCKSIZE 4096
-	char buffer[BLOCKSIZE + 72];
-	size_t sum;
+  char buffer[BLOCKSIZE + 72];
+  size_t sum;
 
-	haval_start (&state, fptlen, passes);
+  haval_start (&state, fptlen, passes);
 
-	for (;;) {
-		ssize_t n;
+  for (;;) {
+    ssize_t n;
 
-		sum = 0;
+    sum = 0;
 
-		if (maxlen) {
-			do {
-				n = read(fd, buffer + sum, (BLOCKSIZE - sum) > maxlen ? maxlen : (BLOCKSIZE - sum));
-				sum += n;
-				maxlen -= n;
-				if (!maxlen)
-					goto add_last;
-			} while (sum < BLOCKSIZE && n > 0);
-		} else {
-			do {
-				n = read(fd, buffer + sum, BLOCKSIZE - sum);
-				sum += n;
-			} while (sum < BLOCKSIZE && n > 0);
-		}
+    if (maxlen) {
+      do {
+        n = read(fd, buffer + sum, (BLOCKSIZE - sum) > maxlen ? maxlen : (BLOCKSIZE - sum));
+        sum += n;
+        maxlen -= n;
+        if (!maxlen) {
+          goto add_last;
+        }
+      } while (sum < BLOCKSIZE && n > 0);
+    } else {
+      do {
+        n = read(fd, buffer + sum, BLOCKSIZE - sum);
+        sum += n;
+      } while (sum < BLOCKSIZE && n > 0);
+    }
 
-		if (n == -1) {
-			if (errno == EINTR)
-				continue;
-			return 1;
-		}
+    if (n == -1) {
+      if (errno == EINTR) {
+        continue;
+      }
+      return 1;
+    }
 
-		if (n == 0)
-			break;
+    if (n == 0) {
+      break;
+    }
 
-		haval_hash(&state, buffer, sum);
-	}
+    haval_hash(&state, buffer, sum);
+  }
 
 add_last:
-	if (sum > 0)
-		haval_hash(&state, buffer, sum);
+  if (sum > 0) {
+    haval_hash(&state, buffer, sum);
+  }
 
-	haval_end(&state, fingerprint);
+  haval_end(&state, fingerprint);
 
-	return 0;
+  return 0;
 }
 
 /* initialization */
 void
 haval_start (haval_state *state, int fptlen, int passes)
 {
-    state->count[0]       = state->count[1] = 0;   /* clear count */
-    state->fingerprint[0] = 0x243F6A88L;           /* initial fingerprint */
-    state->fingerprint[1] = 0x85A308D3L;
-    state->fingerprint[2] = 0x13198A2EL;
-    state->fingerprint[3] = 0x03707344L;
-    state->fingerprint[4] = 0xA4093822L;
-    state->fingerprint[5] = 0x299F31D0L;
-    state->fingerprint[6] = 0x082EFA98L;
-    state->fingerprint[7] = 0xEC4E6C89L;
-    state->fptlen = fptlen;
-    state->passes = passes;
+  state->count[0]       = state->count[1] = 0;   /* clear count */
+  state->fingerprint[0] = 0x243F6A88L;           /* initial fingerprint */
+  state->fingerprint[1] = 0x85A308D3L;
+  state->fingerprint[2] = 0x13198A2EL;
+  state->fingerprint[3] = 0x03707344L;
+  state->fingerprint[4] = 0xA4093822L;
+  state->fingerprint[5] = 0x299F31D0L;
+  state->fingerprint[6] = 0x082EFA98L;
+  state->fingerprint[7] = 0xEC4E6C89L;
+  state->fptlen = fptlen;
+  state->passes = passes;
 }
 
 /*
@@ -327,18 +331,18 @@ haval_hash (haval_state *state,
 
   /* update the number of bits */
   if ((state->count[0] +=  (haval_word)str_len << 3)
-                        < ((haval_word)str_len << 3)) {
-     state->count[1]++;
+      < ((haval_word)str_len << 3)) {
+    state->count[1]++;
   }
   state->count[1] += (haval_word)str_len >> 29;
 
-#ifdef WORDS_BIGENDIAN
+  #ifdef WORDS_BIGENDIAN
   /* hash as many blocks as possible */
   if (rmd_len + str_len >= 128) {
     memcpy (&state->remainder[rmd_len], str, fill_len);
     ch2uint(state->remainder, state->block, 128);
     haval_hash_block (state);
-    for (i = fill_len; i + 127 < str_len; i += 128){
+    for (i = fill_len; i + 127 < str_len; i += 128) {
       memcpy (state->remainder, str+i, 128);
       ch2uint(state->remainder, state->block, 128);
       haval_hash_block (state);
@@ -349,12 +353,12 @@ haval_hash (haval_state *state,
   }
   /* save the remaining input chars */
   memcpy (&state->remainder[rmd_len], str+i, str_len-i);
-#else
+  #else
   /* hash as many blocks as possible */
   if (rmd_len + str_len >= 128) {
     memcpy (((unsigned char *)state->block)+rmd_len, str, fill_len);
     haval_hash_block (state);
-    for (i = fill_len; i + 127 < str_len; i += 128){
+    for (i = fill_len; i + 127 < str_len; i += 128) {
       memcpy ((unsigned char *)state->block, str+i, 128);
       haval_hash_block (state);
     }
@@ -363,7 +367,7 @@ haval_hash (haval_state *state,
     i = 0;
   }
   memcpy (((unsigned char *)state->block)+rmd_len, str+i, str_len-i);
-#endif
+  #endif
 }
 
 /* finalization */
@@ -374,12 +378,12 @@ haval_end (haval_state *state, unsigned char *final_fpt)
   unsigned int  rmd_len, pad_len;
 
   /*
-   * save the version number, the number of passes, the fingerprint 
+   * save the version number, the number of passes, the fingerprint
    * length and the number of bits in the unpadded message.
    */
   tail[0] = (unsigned char)(((state->fptlen  & 0x3) << 6) |
                             ((state->passes  & 0x7) << 3) |
-                             (VERSION & 0x7));
+                            (VERSION & 0x7));
   tail[1] = (unsigned char)((state->fptlen >> 2) & 0xFF);
   uint2ch (state->count, &tail[2], 2);
 
@@ -624,76 +628,76 @@ void haval_tailor (haval_state *state)
   haval_word temp;
 
   if (state->fptlen == 128) {
-    temp = (state->fingerprint[7] & 0x000000FFL) | 
-           (state->fingerprint[6] & 0xFF000000L) | 
-           (state->fingerprint[5] & 0x00FF0000L) | 
+    temp = (state->fingerprint[7] & 0x000000FFL) |
+           (state->fingerprint[6] & 0xFF000000L) |
+           (state->fingerprint[5] & 0x00FF0000L) |
            (state->fingerprint[4] & 0x0000FF00L);
     state->fingerprint[0] += rotate_right(temp,  8);
 
-    temp = (state->fingerprint[7] & 0x0000FF00L) | 
-           (state->fingerprint[6] & 0x000000FFL) | 
-           (state->fingerprint[5] & 0xFF000000L) | 
+    temp = (state->fingerprint[7] & 0x0000FF00L) |
+           (state->fingerprint[6] & 0x000000FFL) |
+           (state->fingerprint[5] & 0xFF000000L) |
            (state->fingerprint[4] & 0x00FF0000L);
     state->fingerprint[1] += rotate_right(temp, 16);
 
-    temp  = (state->fingerprint[7] & 0x00FF0000L) | 
-            (state->fingerprint[6] & 0x0000FF00L) | 
-            (state->fingerprint[5] & 0x000000FFL) | 
+    temp  = (state->fingerprint[7] & 0x00FF0000L) |
+            (state->fingerprint[6] & 0x0000FF00L) |
+            (state->fingerprint[5] & 0x000000FFL) |
             (state->fingerprint[4] & 0xFF000000L);
     state->fingerprint[2] += rotate_right(temp, 24);
 
-    temp = (state->fingerprint[7] & 0xFF000000L) | 
-           (state->fingerprint[6] & 0x00FF0000L) | 
-           (state->fingerprint[5] & 0x0000FF00L) | 
+    temp = (state->fingerprint[7] & 0xFF000000L) |
+           (state->fingerprint[6] & 0x00FF0000L) |
+           (state->fingerprint[5] & 0x0000FF00L) |
            (state->fingerprint[4] & 0x000000FFL);
     state->fingerprint[3] += temp;
   } else if (state->fptlen == 160) {
-    temp = (state->fingerprint[7] &  (haval_word)0x3F) | 
-           (state->fingerprint[6] & ((haval_word)0x7F << 25)) |  
+    temp = (state->fingerprint[7] &  (haval_word)0x3F) |
+           (state->fingerprint[6] & ((haval_word)0x7F << 25)) |
            (state->fingerprint[5] & ((haval_word)0x3F << 19));
     state->fingerprint[0] += rotate_right(temp, 19);
 
-    temp = (state->fingerprint[7] & ((haval_word)0x3F <<  6)) | 
-           (state->fingerprint[6] &  (haval_word)0x3F) |  
+    temp = (state->fingerprint[7] & ((haval_word)0x3F <<  6)) |
+           (state->fingerprint[6] &  (haval_word)0x3F) |
            (state->fingerprint[5] & ((haval_word)0x7F << 25));
     state->fingerprint[1] += rotate_right(temp, 25);
 
-    temp = (state->fingerprint[7] & ((haval_word)0x7F << 12)) | 
-           (state->fingerprint[6] & ((haval_word)0x3F <<  6)) |  
+    temp = (state->fingerprint[7] & ((haval_word)0x7F << 12)) |
+           (state->fingerprint[6] & ((haval_word)0x3F <<  6)) |
            (state->fingerprint[5] &  (haval_word)0x3F);
     state->fingerprint[2] += temp;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x3F << 19)) | 
-           (state->fingerprint[6] & ((haval_word)0x7F << 12)) |  
+    temp = (state->fingerprint[7] & ((haval_word)0x3F << 19)) |
+           (state->fingerprint[6] & ((haval_word)0x7F << 12)) |
            (state->fingerprint[5] & ((haval_word)0x3F <<  6));
-    state->fingerprint[3] += temp >> 6; 
+    state->fingerprint[3] += temp >> 6;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x7F << 25)) | 
-           (state->fingerprint[6] & ((haval_word)0x3F << 19)) |  
+    temp = (state->fingerprint[7] & ((haval_word)0x7F << 25)) |
+           (state->fingerprint[6] & ((haval_word)0x3F << 19)) |
            (state->fingerprint[5] & ((haval_word)0x7F << 12));
     state->fingerprint[4] += temp >> 12;
   } else if (state->fptlen == 192) {
-    temp = (state->fingerprint[7] &  (haval_word)0x1F) | 
-         (state->fingerprint[6] & ((haval_word)0x3F << 26));
+    temp = (state->fingerprint[7] &  (haval_word)0x1F) |
+           (state->fingerprint[6] & ((haval_word)0x3F << 26));
     state->fingerprint[0] += rotate_right(temp, 26);
 
-    temp = (state->fingerprint[7] & ((haval_word)0x1F <<  5)) | 
+    temp = (state->fingerprint[7] & ((haval_word)0x1F <<  5)) |
            (state->fingerprint[6] &  (haval_word)0x1F);
     state->fingerprint[1] += temp;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x3F << 10)) | 
+    temp = (state->fingerprint[7] & ((haval_word)0x3F << 10)) |
            (state->fingerprint[6] & ((haval_word)0x1F <<  5));
     state->fingerprint[2] += temp >> 5;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x1F << 16)) | 
+    temp = (state->fingerprint[7] & ((haval_word)0x1F << 16)) |
            (state->fingerprint[6] & ((haval_word)0x3F << 10));
     state->fingerprint[3] += temp >> 10;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x1F << 21)) | 
+    temp = (state->fingerprint[7] & ((haval_word)0x1F << 21)) |
            (state->fingerprint[6] & ((haval_word)0x1F << 16));
     state->fingerprint[4] += temp >> 16;
 
-    temp = (state->fingerprint[7] & ((haval_word)0x3F << 26)) | 
+    temp = (state->fingerprint[7] & ((haval_word)0x3F << 26)) |
            (state->fingerprint[6] & ((haval_word)0x1F << 21));
     state->fingerprint[5] += temp >> 21;
   } else if (state->fptlen == 224) {

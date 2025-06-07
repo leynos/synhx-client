@@ -1,0 +1,15 @@
+# Artistic Style configuration for synhx-client
+# Two space indents, OTBS braces, 100 character lines.
+# Approximates LLVM guidelines.
+--style=otbs
+--indent=spaces=2
+--indent-switches
+--indent-preproc-block
+--indent-preproc-define
+--indent-preproc-cond
+--indent-col1-comments
+--align-pointer=name
+--align-reference=name
+--max-code-length=100
+--break-after-logical
+--mode=c
