@@ -38,9 +38,9 @@ int getopt_r(int argc, char *const argv[], const char *optstring,
   return do_getopt_long_r(argc, argv, optstring, NULL, NULL, 0, opt);
 }
 
-int _getopt_r_internal(int argc, char *const argv[], const char *optstring,
-                       const struct option *longopts, int *longind,
-                       int long_only, struct opt_r *opt)
+static int _getopt_r_internal(int argc, char *const argv[], const char *optstring,
+                              const struct option *longopts, int *longind,
+                              int long_only, struct opt_r *opt)
 {
   return do_getopt_long_r(argc, argv, optstring, longopts, longind, long_only,
                           opt);
