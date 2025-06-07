@@ -9,8 +9,6 @@ on:
 
 jobs:
   build:
-    # Extra safeguard so the workflow will not run for non-tag pushes
-    if: github.ref_type == 'tag'
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
