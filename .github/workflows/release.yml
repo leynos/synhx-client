@@ -1,7 +1,8 @@
 ---
 name: Release
 
-"on":
+# Trigger only on version tags like v1.2.3
+on:
   push:
     tags:
       - 'v*.*.*'
