@@ -1,3 +1,4 @@
+---
 name: Release
 
 on:
@@ -11,11 +12,18 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-          tar czvf hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz -C dist .
-          files: hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz
-        os: [ubuntu-latest, fedora-latest]
+        os:
+          - ubuntu-latest
+          - fedora-latest
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool
+        run: |
+          sudo dnf install -y make automake gcc gcc-c++ kernel-devel \
+            autoconf libtool
 
-    steps:
+          tar czvf hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz \
+            -C dist .
       - name: Checkout code
         uses: actions/checkout@v4
 
