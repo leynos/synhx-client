@@ -1,0 +1,54 @@
+---
+name: Release
+
+"on":
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+        os:
+          - ubuntu-latest
+          - fedora-latest
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool
+        run: |
+          sudo dnf install -y make automake gcc gcc-c++ kernel-devel \
+            autoconf libtool
+
+          tar czvf hx-${{ matrix.os }}-${{ github.ref_name }}.tar.gz \
+            -C dist .
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y build-essential autoconf automake libtool
+
+      - name: Install build dependencies (Fedora)
+        if: matrix.os == 'fedora-latest'
+        run: sudo dnf install -y make automake gcc gcc-c++ kernel-devel autoconf libtool
+
+      - name: Build
+        run: |
+          ./configure
+          make -j$(nproc)
+
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          cp hx dist/
+          tar czvf hx-${{ matrix.os }}.tar.gz -C dist .
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: hx-${{ matrix.os }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
